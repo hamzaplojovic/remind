@@ -2,18 +2,24 @@
 
 import typer
 
-# Import all command modules
+from remind_cli import __version__
 from remind_cli.commands.add import add
 from remind_cli.commands.list import list_cmd
 from remind_cli.commands.done import done
 from remind_cli.commands.search import search
 from remind_cli.commands.login import login
 from remind_cli.commands.settings import settings
-from remind_cli.commands.scheduler import scheduler
 from remind_cli.commands.doctor import doctor
-from remind_cli.commands.report import report
+from remind_cli.commands.usage import usage
 from remind_cli.commands.upgrade import upgrade
+from remind_cli.commands.update import update
 from remind_cli.commands.uninstall import uninstall
+
+
+def version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"remind {__version__}")
+        raise typer.Exit()
 
 
 app = typer.Typer(help="Remind: AI-powered reminder CLI")
@@ -23,6 +29,10 @@ app = typer.Typer(help="Remind: AI-powered reminder CLI")
 def main(
     ctx: typer.Context,
     quiet: bool = typer.Option(False, "--quiet", "-q", help="Minimal output"),
+    version: bool = typer.Option(
+        False, "--version", "-V", callback=version_callback, is_eager=True,
+        help="Show version and exit",
+    ),
 ) -> None:
     """Remind: AI-powered reminder CLI.
 
@@ -33,6 +43,20 @@ def main(
 
     For help: remind <command> --help
     """
+    # Check for updates (non-blocking, cached, at most once/day)
+    if not quiet:
+        try:
+            from remind_cli.version_check import get_update_notice
+
+            notice = get_update_notice()
+            if notice:
+                from remind_cli import output as _out
+
+                _out.blank()
+                _out.warning(notice)
+        except Exception:
+            pass  # Never break CLI over version check
+
     if ctx.invoked_subcommand is None:
         from remind_cli import output
 
@@ -51,10 +75,10 @@ def main(
         output.blank()
         output.command_row("remind login <token>", "Authenticate")
         output.command_row("remind settings", "View settings")
-        output.command_row("remind scheduler --help", "Background reminders")
         output.command_row("remind doctor", "Diagnose issues")
-        output.command_row("remind report", "Usage statistics")
+        output.command_row("remind usage", "Usage statistics")
         output.command_row("remind upgrade", "View plans")
+        output.command_row("remind update", "Update CLI")
         output.blank()
         output.rule()
         output.hint("For detailed help: remind --help")
@@ -68,8 +92,8 @@ app.command()(done)
 app.command()(search)
 app.command()(login)
 app.command()(settings)
-app.command()(scheduler)
 app.command()(doctor)
-app.command()(report)
+app.command()(usage)
 app.command()(upgrade)
+app.command()(update)
 app.command()(uninstall)

@@ -16,7 +16,6 @@ def add(
     due: str | None = typer.Option(None, "--due", "-d", help="Due date/time (e.g., 'tomorrow 5pm')"),
     priority: str = typer.Option("medium", "--priority", "-p", help="Priority: high, medium, low"),
     project: str | None = typer.Option(None, "--project", "-P", help="Project context"),
-    no_ai: bool = typer.Option(False, "--no-ai", help="Skip AI suggestion"),
     allow_past_due: bool = typer.Option(False, "--allow-past-due", hidden=True, help="Allow past due dates (testing only)"),
 ) -> None:
     """Add a new reminder.
@@ -24,7 +23,7 @@ def add(
     Examples:
       remind add 'Buy groceries'
       remind add 'Call mom' --due 'tomorrow 5pm' --priority high
-      remind add 'Review PR' --project work --no-ai
+      remind add 'Review PR' --project work
     """
     try:
         from dateparser import parse as dateparser_parse
@@ -49,17 +48,16 @@ def add(
         db_config = DatabaseConfig()
         db_session = DatabaseSession(db_config)
 
-        # Get AI suggestion if enabled
+        # Get AI suggestion
         ai_text = None
-        if not no_ai:
-            ai_service = AIService()
-            try:
-                with output.spinner("Getting AI suggestion"):
-                    ai_response = ai_service.suggest_reminder(text)
-                ai_text = ai_response.suggested_text
-                output.ai_suggestion(ai_text)
-            except Exception as e:
-                output.warning(f"AI suggestion failed: {e}")
+        ai_service = AIService()
+        try:
+            with output.spinner("Getting AI suggestion"):
+                ai_response = ai_service.suggest_reminder(text)
+            ai_text = ai_response.suggested_text
+            output.ai_suggestion(ai_text)
+        except Exception as e:
+            output.warning(f"AI suggestion failed: {e}")
 
         # Create reminder with context manager
         with db_session.get_session() as session:

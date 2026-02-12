@@ -18,14 +18,10 @@ if config.config_file_name is not None:
 database_url = os.getenv("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
 config.set_main_option("sqlalchemy.url", database_url)
 
-# add your model's MetaData object for 'autogenerate' support
-# Note: Models are imported from the backend package
-try:
-    from remind_database.models import Base
-    target_metadata = Base.metadata
-except ImportError:
-    # Fallback if package not available
-    target_metadata = None
+# Import Base from the backend package for autogenerate support
+from remind_backend.database import Base
+
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:

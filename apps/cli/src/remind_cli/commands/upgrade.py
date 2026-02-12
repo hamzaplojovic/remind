@@ -6,6 +6,20 @@ from remind_cli.services.config_service import ConfigService
 from remind_cli import output
 
 
+def _get_plan_display(config_service: ConfigService) -> str:
+    """Get plan tier from stored config."""
+    plan_tier = config_service.get_setting("plan_tier")
+    if plan_tier:
+        return plan_tier.capitalize()
+    token = config_service.get_license_token()
+    if not token:
+        return "Free"
+    for tier in ("team", "pro", "indie"):
+        if tier in token:
+            return tier.capitalize()
+    return "Free"
+
+
 def upgrade() -> None:
     """Upgrade to a paid Remind plan.
 
@@ -20,19 +34,7 @@ def upgrade() -> None:
     """
     try:
         config_service = ConfigService()
-        token = config_service.get_license_token()
-
-        if token:
-            if "pro" in token:
-                plan = "Pro"
-            elif "enterprise" in token:
-                plan = "Team"
-            elif "indie" in token:
-                plan = "Indie"
-            else:
-                plan = "Free"
-        else:
-            plan = "Free"
+        plan = _get_plan_display(config_service)
 
         output.header("PLANS")
         output.label_value("Current plan", plan)

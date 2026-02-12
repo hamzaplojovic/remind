@@ -5,8 +5,8 @@ from datetime import datetime
 from functools import wraps
 from pathlib import Path
 
-from remind.config import get_license_path
-from remind.models import License
+from remind_shared import License
+from remind_cli.config import get_license_path
 
 
 class PremiumRequired(Exception):

@@ -5,14 +5,14 @@ from pathlib import Path
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from remind.models import Config as ConfigModel
-from remind.platform_utils import (
+from remind_shared import Config as ConfigModel
+from remind_cli.platform_utils import (
     get_config_path as _get_config_path,
 )
-from remind.platform_utils import (
+from remind_cli.platform_utils import (
     get_db_path as _get_db_path,
 )
-from remind.platform_utils import (
+from remind_cli.platform_utils import (
     get_license_path as _get_license_path,
 )
 
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     notifications_enabled: bool = True
     notification_sound_enabled: bool = True
     ai_rephrasing_enabled: bool = True
+    ai_backend_url: str | None = "http://localhost:8000"
     openai_api_key: str | None = None
     nudge_intervals_minutes: str = "5,15,60"
 
@@ -84,6 +85,8 @@ def load_config() -> ConfigModel:
         config_data["notification_sound_enabled"] = False
     if not settings.ai_rephrasing_enabled:
         config_data["ai_rephrasing_enabled"] = False
+    if settings.ai_backend_url:
+        config_data["ai_backend_url"] = settings.ai_backend_url
     if settings.openai_api_key:
         config_data["openai_api_key"] = settings.openai_api_key
 

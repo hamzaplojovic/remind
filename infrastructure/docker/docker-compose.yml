@@ -31,8 +31,8 @@ services:
       HOST: 0.0.0.0
       PORT: 8000
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      PADDLE_API_KEY: ${PADDLE_API_KEY:-}
-      PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET:-}
+      POLAR_API_KEY: ${POLAR_API_KEY:-}
+      POLAR_WEBHOOK_SECRET: ${POLAR_WEBHOOK_SECRET:-}
     ports:
       - "8000:8000"
     depends_on:
