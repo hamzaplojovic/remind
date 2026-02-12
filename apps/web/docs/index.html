@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link active">Overview</a>
+        <a href="getting-started.html" class="sidebar-link">Installation</a>
+        <a href="getting-started.html#quickstart" class="sidebar-link sub">Quickstart</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link">Commands</a>
+        <a href="commands.html#add" class="sidebar-link sub">add</a>
+        <a href="commands.html#list" class="sidebar-link sub">list</a>
+        <a href="commands.html#done" class="sidebar-link sub">done</a>
+        <a href="commands.html#search" class="sidebar-link sub">search</a>
+        <a href="commands.html#more" class="sidebar-link sub">more...</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+      </div>
+
+      <h1>Remind Documentation</h1>
+
+      <p class="lead">
+        Remind is an AI-powered CLI for managing reminders from the terminal. It parses natural language, suggests optimal timing and priority, and delivers native notifications when things are due.
+      </p>
+
+      <hr>
+
+      <h2>Quick overview</h2>
+
+      <p>Three commands cover 90% of daily usage:</p>
+
+<pre><code><span class="term-comment"># Create a reminder with AI-enhanced text</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"call mom tomorrow"</span>
+  <span class="term-output">AI</span>  <span class="term-string">Call mom tomorrow at 3:00 PM</span>
+  <span class="term-success">✓</span> <span class="term-output">Reminder saved (#4)</span>
+
+<span class="term-comment"># List active reminders</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind list</span>
+  <span class="term-output">ID   TEXT                      DUE              PRI</span>
+  <span class="term-output"> 1   Review PR #234            today 5pm        HIGH</span>
+  <span class="term-output"> 2   Buy groceries             tonight          MED</span>
+  <span class="term-output"> 4   Call mom                  tomorrow 3pm     HIGH</span>
+
+<span class="term-comment"># Mark as done</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind done</span> <span class="term-string">1</span>
+  <span class="term-success">✓</span> <span class="term-output">Done: Review PR #234</span></code></pre>
+
+      <h2>Core concepts</h2>
+
+      <h3>Reminders</h3>
+      <p>Each reminder has a text description, due date/time, and priority level (high, medium, low). Reminders live in a local SQLite database and persist across sessions.</p>
+
+      <h3>AI suggestions</h3>
+      <p>When you create a reminder, Remind's AI analyzes your input and suggests improved text, optimal timing, and appropriate priority. This is optional and can be disabled with <code>--no-ai</code> or in settings.</p>
+
+      <h3>Notifications</h3>
+      <p>The background scheduler monitors due reminders and delivers native OS notifications. Works on macOS, Linux, and Windows.</p>
+
+      <h3>Plans & quotas</h3>
+      <p>The CLI itself is free and unlimited. AI suggestions are metered by plan tier. See <a href="../index.html#pricing">Pricing</a> for details.</p>
+
+      <hr>
+
+      <h2>What's in the docs</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th>What you'll find</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="getting-started.html">Getting Started</a></td>
+            <td>Installation methods, first-run setup, quickstart tutorial</td>
+          </tr>
+          <tr>
+            <td><a href="commands.html">Commands</a></td>
+            <td>Full reference for every command, flag, and option</td>
+          </tr>
+          <tr>
+            <td><a href="configuration.html">Configuration</a></td>
+            <td>Settings, environment variables, config file location</td>
+          </tr>
+          <tr>
+            <td><a href="ai-features.html">AI Features</a></td>
+            <td>How AI suggestions work, accuracy, quotas, disabling AI</td>
+          </tr>
+          <tr>
+            <td><a href="troubleshooting.html">Troubleshooting</a></td>
+            <td>Common issues, the <code>doctor</code> command, FAQ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Prev/Next -->
+      <div class="doc-nav">
+        <div></div>
+        <a href="getting-started.html" class="next">
+          <div class="doc-nav-label">Next</div>
+          <div class="doc-nav-title">Getting Started</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

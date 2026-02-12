@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Remind CLI</title>
+  <meta name="description" content="Articles, guides, and updates from the Remind CLI team. Tips for productivity, shell workflows, and AI-powered task management.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Theme Variables ─────────────────────────────────────────── */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --bg-terminal: #1a1715;
+      --bg-code-inline: #f0ebe4;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --accent-secondary: #2d6a4f;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --bg-terminal: #0d0c0b;
+      --bg-code-inline: #2a2724;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --accent-secondary: #52b788;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* ── Base ────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      line-height: 1.7;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* Grain texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    a:hover { opacity: 0.8; }
+
+    /* ── Typography ──────────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: 'Young Serif', Georgia, serif;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    /* ── Top Nav ─────────────────────────────────────────────────── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.5s ease, border-color 0.5s ease;
+    }
+
+    .top-nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .top-nav .logo {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.35rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .top-nav .logo span { color: var(--accent); }
+
+    .top-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .top-nav-links a {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .top-nav-links a.active { color: var(--accent); }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 40px;
+      height: 22px;
+      border-radius: 11px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(18px); }
+
+    /* ── Page Layout ─────────────────────────────────────────────── */
+    .page-header {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.75rem;
+      line-height: 1.15;
+      margin: 0 0 0.75rem;
+    }
+
+    .page-header .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.7;
+    }
+
+    .page-header .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    /* ── Blog Grid ───────────────────────────────────────────────── */
+    .blog-grid {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 1rem 2rem 4rem;
+    }
+
+    .post-card {
+      display: block;
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+      color: inherit;
+    }
+
+    .post-card:first-child {
+      border-top: none;
+      padding-top: 1rem;
+    }
+
+    .post-card:hover {
+      opacity: 1;
+    }
+
+    .post-card:hover .post-title {
+      color: var(--accent);
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .post-date {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .post-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-tertiary);
+      transition: border-color 0.5s ease, color 0.5s ease;
+    }
+
+    .post-title {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.65rem;
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--text);
+      margin: 0 0 0.75rem;
+      transition: color 0.3s ease;
+    }
+
+    .post-excerpt {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin: 0 0 1.25rem;
+    }
+
+    .read-more {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: gap 0.3s ease;
+    }
+
+    .post-card:hover .read-more {
+      gap: 0.7rem;
+    }
+
+    .read-more-arrow {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .footer-brand {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-brand span { color: var(--accent); }
+
+    .footer-tagline {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .footer-heading {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li { margin-bottom: 0.6rem; }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .footer-rule {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 1.5rem;
+      transition: background 0.5s ease;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-bottom p {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 3rem 1.5rem 1.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 2.15rem;
+      }
+
+      .blog-grid {
+        padding: 0 1.5rem 3rem;
+      }
+
+      .post-title {
+        font-size: 1.4rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+
+      .top-nav-links a:not(.active) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ═══════════ NAVIGATION ═══════════ -->
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="../docs/index.html">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../changelog.html">Changelog</a>
+        <a href="index.html" class="active">Blog</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════ PAGE HEADER ═══════════ -->
+  <header class="page-header">
+    <span class="label">From the Team</span>
+    <h1>Blog</h1>
+    <p class="subtitle">Thoughts on building a CLI, working with AI, and the workflows that keep us productive.</p>
+  </header>
+
+  <!-- ═══════════ BLOG LISTING ═══════════ -->
+  <div class="blog-grid">
+
+    <!-- Post 1 -->
+    <a href="#" class="post-card">
+      <div class="post-meta">
+        <span class="post-date">February 3, 2026</span>
+        <span class="post-tag">Announcement</span>
+      </div>
+      <h2 class="post-title">Introducing Remind 1.0</h2>
+      <p class="post-excerpt">
+        After six months of beta testing with over 10,000 developers, Remind CLI is officially stable. This post walks through what changed since the first public beta, the design decisions behind the plugin system, and where we are headed next.
+      </p>
+      <span class="read-more">
+        Read more
+        <svg class="read-more-arrow" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <!-- Post 2 -->
+    <a href="#" class="post-card">
+      <div class="post-meta">
+        <span class="post-date">January 10, 2026</span>
+        <span class="post-tag">Guide</span>
+      </div>
+      <h2 class="post-title">5 Shell Aliases for Power Users</h2>
+      <p class="post-excerpt">
+        Remind is fast out of the box, but a handful of shell aliases can make it feel instant. We share the five aliases we use daily -- from quick-add shortcuts to a single-keystroke "what's due now" command -- and explain how to wire them into your dotfiles.
+      </p>
+      <span class="read-more">
+        Read more
+        <svg class="read-more-arrow" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+    <!-- Post 3 -->
+    <a href="#" class="post-card">
+      <div class="post-meta">
+        <span class="post-date">December 4, 2025</span>
+        <span class="post-tag">Deep Dive</span>
+      </div>
+      <h2 class="post-title">How AI Makes Your Reminders Smarter</h2>
+      <p class="post-excerpt">
+        When you type "deploy by friday," Remind's AI parses your intent, picks an appropriate time, assigns a priority, and refines the phrasing. This post explains the pipeline behind that process -- from tokenization to the final suggestion -- and how we keep latency under 200ms.
+      </p>
+      <span class="read-more">
+        Read more
+        <svg class="read-more-arrow" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
+
+  </div>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand">remind<span>.</span></p>
+          <p class="footer-tagline">AI-powered reminders<br>for the terminal.</p>
+        </div>
+        <div>
+          <p class="footer-heading">Product</p>
+          <ul class="footer-links">
+            <li><a href="../index.html#features">Features</a></li>
+            <li><a href="../index.html#pricing">Pricing</a></li>
+            <li><a href="../changelog.html">Changelog</a></li>
+            <li><a href="../docs/index.html">Documentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-heading">Company</p>
+          <ul class="footer-links">
+            <li><a href="index.html">Blog</a></li>
+            <li><a href="../index.html#contact">Contact</a></li>
+            <li><a href="../status.html">Status</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-heading">Legal</p>
+          <ul class="footer-links">
+            <li><a href="../privacy.html">Privacy Policy</a></li>
+            <li><a href="../terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr class="footer-rule">
+      <div class="footer-bottom">
+        <p>&copy; 2025 Remind. All rights reserved.</p>
+        <p>Built with care for the terminal.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Theme Toggle ──
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

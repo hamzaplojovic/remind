@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commands — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link">Overview</a>
+        <a href="getting-started.html" class="sidebar-link">Installation</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link active">Commands</a>
+        <a href="#add" class="sidebar-link sub">add</a>
+        <a href="#list" class="sidebar-link sub">list</a>
+        <a href="#done" class="sidebar-link sub">done</a>
+        <a href="#search" class="sidebar-link sub">search</a>
+        <a href="#login" class="sidebar-link sub">login</a>
+        <a href="#settings" class="sidebar-link sub">settings</a>
+        <a href="#scheduler" class="sidebar-link sub">scheduler</a>
+        <a href="#doctor" class="sidebar-link sub">doctor</a>
+        <a href="#report" class="sidebar-link sub">report</a>
+        <a href="#upgrade" class="sidebar-link sub">upgrade</a>
+        <a href="#uninstall" class="sidebar-link sub">uninstall</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="sep">/</span>
+        Commands
+      </div>
+
+      <h1>Command Reference</h1>
+
+      <p class="lead">Complete reference for every Remind command, flag, and option.</p>
+
+      <hr>
+
+      <!-- ═══════════ ADD ═══════════ -->
+      <h2 id="add">remind add</h2>
+
+      <p>Create a new reminder. By default, AI will enhance the text with better phrasing, suggested timing, and priority.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">&lt;text&gt;</span> [OPTIONS]</code></pre>
+
+      <h4>Arguments</h4>
+      <dl>
+        <dt><code>text</code> (required)</dt>
+        <dd>The reminder text. Accepts natural language.</dd>
+      </dl>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td><code>--due</code></td><td><code>-d</code></td><td>Due date/time in natural language</td><td>now</td></tr>
+          <tr><td><code>--priority</code></td><td><code>-p</code></td><td>Priority: <code>high</code>, <code>medium</code>, <code>low</code></td><td>medium</td></tr>
+          <tr><td><code>--project</code></td><td><code>-P</code></td><td>Project context tag</td><td>none</td></tr>
+          <tr><td><code>--no-ai</code></td><td></td><td>Skip AI suggestion</td><td>false</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Examples</h4>
+
+<pre><code><span class="term-comment"># Simple reminder</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"buy groceries"</span>
+
+<span class="term-comment"># With due date and priority</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"review PR #234"</span> <span class="term-flag">--due</span> <span class="term-string">"friday 5pm"</span> <span class="term-flag">--priority</span> <span class="term-string">high</span>
+
+<span class="term-comment"># With project tag, no AI</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"deploy to staging"</span> <span class="term-flag">--project</span> <span class="term-string">work</span> <span class="term-flag">--no-ai</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ LIST ═══════════ -->
+      <h2 id="list">remind list</h2>
+
+      <p>Display reminders in a formatted table. Shows active (not done) reminders by default.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind list</span> [OPTIONS]</code></pre>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--all</code></td><td><code>-a</code></td><td>Include completed reminders</td></tr>
+          <tr><td><code>--priority</code></td><td><code>-p</code></td><td>Filter by priority level</td></tr>
+          <tr><td><code>--json</code></td><td><code>-j</code></td><td>Output as JSON</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Examples</h4>
+
+<pre><code><span class="term-comment"># Active reminders</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind list</span>
+
+<span class="term-comment"># Only high-priority</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind list</span> <span class="term-flag">--priority</span> <span class="term-string">high</span>
+
+<span class="term-comment"># All reminders as JSON (for piping)</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind list</span> <span class="term-flag">--all</span> <span class="term-flag">--json</span> | jq <span class="term-string">'.[].text'</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ DONE ═══════════ -->
+      <h2 id="done">remind done</h2>
+
+      <p>Mark a reminder as complete by its ID.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind done</span> <span class="term-string">&lt;reminder_id&gt;</span></code></pre>
+
+      <h4>Arguments</h4>
+      <dl>
+        <dt><code>reminder_id</code> (required)</dt>
+        <dd>The numeric ID of the reminder to complete. Find IDs with <code>remind list</code>.</dd>
+      </dl>
+
+      <h4>Examples</h4>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind done</span> <span class="term-string">1</span>
+  <span class="term-success">✓</span> <span class="term-output">Done: Buy groceries</span>
+
+<span class="term-prompt">$</span> <span class="term-cmd">remind done</span> <span class="term-string">42</span>
+  <span class="term-success">✓</span> <span class="term-output">Done: Ship v2.0 release</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ SEARCH ═══════════ -->
+      <h2 id="search">remind search</h2>
+
+      <p>Full-text search across all reminder text.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind search</span> <span class="term-string">&lt;query&gt;</span> [OPTIONS]</code></pre>
+
+      <h4>Arguments</h4>
+      <dl>
+        <dt><code>query</code> (required)</dt>
+        <dd>Search term. Matches against reminder text.</dd>
+      </dl>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--json</code></td><td><code>-j</code></td><td>Output as JSON</td></tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <!-- ═══════════ LOGIN ═══════════ -->
+      <h2 id="login">remind login</h2>
+
+      <p>Authenticate with your license token. Required for paid plan features.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind login</span> <span class="term-string">&lt;token&gt;</span></code></pre>
+
+      <h4>Arguments</h4>
+      <dl>
+        <dt><code>token</code> (required)</dt>
+        <dd>License token starting with <code>remind_</code>. Get one at <a href="../index.html#pricing">remind.dev/pricing</a>.</dd>
+      </dl>
+
+      <h4>Examples</h4>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind login</span> <span class="term-string">remind_indie_abc123xyz789</span>
+  <span class="term-success">✓</span> <span class="term-output">Logged in successfully</span>
+  <span class="term-output">PLAN               Indie</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ SETTINGS ═══════════ -->
+      <h2 id="settings">remind settings</h2>
+
+      <p>View and modify configuration. See <a href="configuration.html">Configuration</a> for all available keys.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> [OPTIONS]</code></pre>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--view</code></td><td><code>-v</code></td><td>Show all settings as JSON</td></tr>
+          <tr><td><code>--set</code></td><td><code>-s</code></td><td>Set a key=value pair</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Examples</h4>
+
+<pre><code><span class="term-comment"># View summary</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span>
+
+<span class="term-comment"># See all settings</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--view</span>
+
+<span class="term-comment"># Disable AI</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">ai_rephrasing_enabled=false</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ SCHEDULER ═══════════ -->
+      <h2 id="scheduler">remind scheduler</h2>
+
+      <p>Manage the background notification service. Requires Indie plan or higher.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> [OPTIONS]</code></pre>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--status</code></td><td>Show current scheduler status</td></tr>
+          <tr><td><code>--enable</code></td><td>Start background notification service</td></tr>
+          <tr><td><code>--disable</code></td><td>Stop background notification service</td></tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <!-- ═══════════ DOCTOR ═══════════ -->
+      <h2 id="doctor">remind doctor</h2>
+
+      <p>Run diagnostic checks on your Remind installation. Verifies database, configuration, license, and permissions.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind doctor</span></code></pre>
+
+      <h4>Output</h4>
+
+<pre><code><span class="term-output">remind.</span>
+<span class="term-output">DIAGNOSTICS</span>
+<span class="term-output">────────────────────────────────────────────</span>
+  <span class="term-output">DATABASE           </span><span class="term-success">✓ connected</span>
+  <span class="term-output">CONFIGURATION      </span><span class="term-success">✓ valid</span>
+  <span class="term-output">LICENSE TOKEN      </span><span class="term-success">✓ authenticated</span>
+  <span class="term-output">REMINDERS          </span><span class="term-success">✓ accessible</span>
+
+<span class="term-output">────────────────────────────────────────────</span>
+  <span class="term-success">✓</span> <span class="term-output">All checks passed.</span></code></pre>
+
+      <p>See <a href="troubleshooting.html">Troubleshooting</a> for interpreting results.</p>
+
+      <hr>
+
+      <!-- ═══════════ REPORT ═══════════ -->
+      <h2 id="report">remind report</h2>
+
+      <p>Show usage statistics and productivity insights. Requires authentication.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind report</span> [OPTIONS]</code></pre>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--format</code></td><td><code>-f</code></td><td>Output format: <code>table</code> (default) or <code>json</code></td></tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <!-- ═══════════ UPGRADE ═══════════ -->
+      <h2 id="upgrade">remind upgrade</h2>
+
+      <p>View available plans and your current tier. Directs you to the web dashboard to manage billing.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind upgrade</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ UNINSTALL ═══════════ -->
+      <h2 id="uninstall">remind uninstall</h2>
+
+      <p>Remove Remind configuration from your system. Reminders are preserved in the database.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind uninstall</span> [OPTIONS]</code></pre>
+
+      <h4>Options</h4>
+      <table>
+        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--yes</code></td><td><code>-y</code></td><td>Skip confirmation prompt</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <div class="callout-label">Warning</div>
+        <p>This removes configuration and disables the scheduler. Your reminders are preserved in <code>~/.remind/</code> and can be accessed after reinstalling.</p>
+      </div>
+
+      <!-- Prev/Next -->
+      <div class="doc-nav">
+        <a href="getting-started.html">
+          <div class="doc-nav-label">Previous</div>
+          <div class="doc-nav-title">Getting Started</div>
+        </a>
+        <a href="configuration.html" class="next">
+          <div class="doc-nav-label">Next</div>
+          <div class="doc-nav-title">Configuration</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    toggle.addEventListener('click', () => { html.classList.toggle('dark'); localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</body>
+</html>

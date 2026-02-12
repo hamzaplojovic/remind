@@ -1,0 +1,55 @@
+name: Test CLI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/cli/**"
+      - "packages/database/**"
+      - "packages/shared/**"
+      - ".github/workflows/test-cli.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/cli/**"
+      - "packages/database/**"
+      - "packages/shared/**"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Run tests
+        run: |
+          uv run pytest apps/cli/tests -v --cov=apps/cli --cov-report=xml
+
+      - name: Build CLI
+        run: |
+          cd apps/cli
+          uv run pyinstaller remind_cli/__main__.py --onefile --name remind
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: cli
+          name: cli-coverage-${{ matrix.os }}

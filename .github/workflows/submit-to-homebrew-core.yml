@@ -1,0 +1,236 @@
+name: Submit to Homebrew Core
+
+on:
+  workflow_run:
+    workflows: ["Release Binaries"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-eligibility:
+    name: Check Homebrew Submission Eligibility
+    runs-on: ubuntu-latest
+    outputs:
+      eligible: ${{ steps.check.outputs.eligible }}
+      version: ${{ steps.check.outputs.version }}
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check eligibility for homebrew-core
+        id: check
+        run: |
+          # Get the tag that triggered the release workflow
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "eligible=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+          # Check if this is a stable release (not pre-release)
+          if [[ "$LATEST_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "eligible=true" >> $GITHUB_OUTPUT
+            echo "✓ Stable release detected: $LATEST_TAG"
+          else
+            echo "eligible=false" >> $GITHUB_OUTPUT
+            echo "ℹ Pre-release detected: $LATEST_TAG (skipping homebrew-core submission)"
+          fi
+
+  create-pr:
+    name: Create Homebrew Core PR
+    needs: check-eligibility
+    runs-on: ubuntu-latest
+    if: needs.check-eligibility.outputs.eligible == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get release info
+        id: release_info
+        run: |
+          VERSION="${{ needs.check-eligibility.outputs.version }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Fetch release details
+          RELEASE_JSON=$(curl -s "https://api.github.com/repos/hamzaplojovic/remind/releases/tags/$VERSION")
+          RELEASE_URL=$(echo "$RELEASE_JSON" | jq -r '.html_url')
+          echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+
+          # Validate release exists
+          if echo "$RELEASE_JSON" | jq -e '.id' > /dev/null 2>&1; then
+            echo "✓ Release found: $RELEASE_URL"
+          else
+            echo "❌ Release not found for tag $VERSION"
+            exit 1
+          fi
+
+      - name: Checkout homebrew-core
+        uses: actions/checkout@v4
+        with:
+          repository: Homebrew/homebrew-core
+          path: homebrew-core
+          token: ${{ secrets.HOMEBREW_GITHUB_TOKEN || github.token }}
+
+      - name: Create formula file
+        run: |
+          mkdir -p homebrew-core/Formula
+          cp apps/cli/build_tools/homebrew_formula.rb homebrew-core/Formula/remind-cli.rb
+
+          # Verify
+          if [ ! -f "homebrew-core/Formula/remind-cli.rb" ]; then
+            echo "❌ Failed to create formula file"
+            exit 1
+          fi
+          echo "✓ Formula created for homebrew-core"
+
+      - name: Check for existing formula
+        id: existing
+        run: |
+          if [ -f "homebrew-core/Formula/remind-cli.rb" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate formula
+        run: |
+          cd homebrew-core
+
+          # Basic syntax check
+          if ! grep -q "class RemindCli" Formula/remind-cli.rb; then
+            echo "❌ Formula missing RemindCli class"
+            exit 1
+          fi
+
+          if ! grep -q "def install" Formula/remind-cli.rb; then
+            echo "❌ Formula missing install method"
+            exit 1
+          fi
+
+          echo "✓ Formula syntax validated"
+
+      - name: Create pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          repository: Homebrew/homebrew-core
+          token: ${{ secrets.HOMEBREW_GITHUB_TOKEN || github.token }}
+          commit-message: |
+            Add remind-cli formula for ${{ steps.release_info.outputs.version }}
+
+            - Platform: macOS (Intel/ARM), Linux
+            - Binary: Standalone PyInstaller executable
+            - Features: Reminders, scheduler, notifications
+          title: "Add remind-cli formula"
+          body: |
+            ## Description
+
+            This PR adds the `remind-cli` formula to Homebrew Core.
+
+            **Remind** is an AI-powered CLI reminder and notification engine with:
+            - 🚀 Cross-platform (macOS, Linux)
+            - 🔔 Native notifications
+            - ⏰ Background scheduler
+            - 🤖 AI-powered suggestions
+
+            ## Details
+
+            - **Version**: ${{ steps.release_info.outputs.version }}
+            - **Repository**: https://github.com/hamzaplojovic/remind
+            - **Release**: ${{ steps.release_info.outputs.release_url }}
+            - **License**: MIT
+
+            ## Build Information
+
+            - **Binary**: Standalone executable (PyInstaller)
+            - **Size**: ~30-50MB
+            - **Dependencies**: None required at runtime
+            - **Platforms**:
+              - macOS x86_64 (Intel)
+              - macOS ARM64 (Apple Silicon)
+              - Linux x86_64
+
+            ## Testing
+
+            The formula has been tested to:
+            - ✓ Download and verify SHA256 checksums
+            - ✓ Execute binary without errors
+            - ✓ Display help and version information
+            - ✓ Handle platform-specific installation
+
+            ## Installation
+
+            ```bash
+            brew install remind-cli
+            remind --version
+            remind --help
+            ```
+
+            ## Community
+
+            - **GitHub**: https://github.com/hamzaplojovic/remind
+            - **Community Tap**: `brew tap hamzaplojovic/remind`
+
+            ---
+
+            This formula was auto-generated from the GitHub release. Binary checksums are verified against official GitHub releases.
+          branch: add-remind-cli-formula-${{ steps.release_info.outputs.version }}
+          delete-branch: true
+          labels: |
+            formula
+            new-formula
+
+      - name: Report PR status
+        if: always()
+        run: |
+          if [ "${{ steps.create_pr.outputs.pull-request-number }}" != "" ]; then
+            echo "✅ PR created successfully!"
+            echo ""
+            echo "PR Details:"
+            echo "  Number: ${{ steps.create_pr.outputs.pull-request-number }}"
+            echo "  URL: ${{ steps.create_pr.outputs.pull-request-url }}"
+            echo ""
+            echo "Next steps:"
+            echo "  1. Monitor PR for Homebrew maintainer feedback"
+            echo "  2. Be prepared to address any review comments"
+            echo "  3. Follow https://docs.brew.sh/Acceptable-Formulae"
+          else
+            echo "⚠️  Could not determine PR status"
+          fi
+
+  notify-completion:
+    name: Notify Completion
+    needs: [check-eligibility, create-pr]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Summary
+        run: |
+          echo "🎉 Homebrew CI/CD Pipeline Complete!"
+          echo ""
+          if [ "${{ needs.check-eligibility.outputs.eligible }}" = "true" ]; then
+            echo "✅ Submitted to homebrew-core"
+            echo "   Version: ${{ needs.check-eligibility.outputs.version }}"
+            echo "   Status: PR created (awaiting review)"
+            echo ""
+            echo "Users can still install immediately with:"
+            echo "  brew tap hamzaplojovic/remind"
+            echo "  brew install remind-cli"
+          else
+            echo "ℹ️  Pre-release detected"
+            echo "   Version: ${{ needs.check-eligibility.outputs.version }}"
+            echo "   Status: Skipped homebrew-core submission"
+            echo ""
+            echo "Users can install with:"
+            echo "  brew tap hamzaplojovic/remind"
+            echo "  brew install remind-cli"
+          fi

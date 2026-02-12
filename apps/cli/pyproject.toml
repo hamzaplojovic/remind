@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "remind-cli"
+version = "1.0.0"
+description = "A cross-platform CLI reminder and notification engine with AI-powered suggestions and smart nudges"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Remind Contributors" }
+]
+keywords = ["cli", "reminders", "notifications", "scheduler", "ai"]
+
+dependencies = [
+    "typer[all]",
+    "pydantic",
+    "sqlalchemy",
+    "notify-py",
+    "dateparser",
+    "pydantic-settings",
+    "httpx",
+    "tabulate",
+    "remind-shared",
+    "remind-database",
+]
+
+[project.optional-dependencies]
+linux = [
+    "dbus-python",  # For beautiful D-Bus notifications on Linux
+]
+macos = []  # macOS uses AppleScript (built-in)
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.11.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+]
+build = [
+    "pyinstaller>=6.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/hamzaplojovic/remind"
+Repository = "https://github.com/hamzaplojovic/remind.git"
+Documentation = "https://github.com/hamzaplojovic/remind/blob/main/README.md"
+"Bug Tracker" = "https://github.com/hamzaplojovic/remind/issues"
+
+[project.scripts]
+remind = "remind_cli.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/remind_cli"]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = ["E501"]
+
+[tool.uv.sources]
+remind-shared = { workspace = true }
+remind-database = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"

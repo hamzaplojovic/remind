@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link">Overview</a>
+        <a href="getting-started.html" class="sidebar-link">Installation</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link">Commands</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link active">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="sep">/</span>
+        Configuration
+      </div>
+
+      <h1>Configuration</h1>
+
+      <p class="lead">Remind stores configuration in a JSON file at <code>~/.remind/config.json</code>. All settings can be modified via the CLI or by editing the file directly.</p>
+
+      <hr>
+
+      <h2>Config file location</h2>
+
+      <p>The config file is automatically created on first run:</p>
+
+      <table>
+        <thead><tr><th>Platform</th><th>Path</th></tr></thead>
+        <tbody>
+          <tr><td>macOS</td><td><code>~/.remind/config.json</code></td></tr>
+          <tr><td>Linux</td><td><code>~/.remind/config.json</code></td></tr>
+          <tr><td>Windows</td><td><code>%USERPROFILE%\.remind\config.json</code></td></tr>
+        </tbody>
+      </table>
+
+      <p>View the path on your system:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind settings</span>
+  <span class="term-output">CONFIG             ~/.remind/config.json</span></code></pre>
+
+      <hr>
+
+      <h2>Settings reference</h2>
+
+      <table>
+        <thead><tr><th>Key</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>timezone</code></td>
+            <td>string</td>
+            <td><code>"UTC"</code></td>
+            <td>IANA timezone for due date display</td>
+          </tr>
+          <tr>
+            <td><code>scheduler_interval_minutes</code></td>
+            <td>int</td>
+            <td><code>1</code></td>
+            <td>How often the scheduler checks for due reminders (1-60)</td>
+          </tr>
+          <tr>
+            <td><code>notifications_enabled</code></td>
+            <td>bool</td>
+            <td><code>true</code></td>
+            <td>Enable/disable OS notifications</td>
+          </tr>
+          <tr>
+            <td><code>notification_sound_enabled</code></td>
+            <td>bool</td>
+            <td><code>true</code></td>
+            <td>Play sound with notifications</td>
+          </tr>
+          <tr>
+            <td><code>ai_rephrasing_enabled</code></td>
+            <td>bool</td>
+            <td><code>true</code></td>
+            <td>Use AI to enhance reminder text</td>
+          </tr>
+          <tr>
+            <td><code>ai_backend_url</code></td>
+            <td>string | null</td>
+            <td><code>null</code></td>
+            <td>Custom backend API URL for AI suggestions</td>
+          </tr>
+          <tr>
+            <td><code>openai_api_key</code></td>
+            <td>string | null</td>
+            <td><code>null</code></td>
+            <td>OpenAI API key for local AI usage</td>
+          </tr>
+          <tr>
+            <td><code>nudge_intervals_minutes</code></td>
+            <td>list[int]</td>
+            <td><code>[5, 15, 60]</code></td>
+            <td>Minutes after due time to send follow-up nudges</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Modifying settings</h2>
+
+      <h3>Via CLI</h3>
+
+<pre><code><span class="term-comment"># Set a value</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">timezone=America/New_York</span>
+  <span class="term-success">✓</span> <span class="term-output">Set timezone = America/New_York</span>
+
+<span class="term-comment"># Disable AI</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">ai_rephrasing_enabled=false</span>
+  <span class="term-success">✓</span> <span class="term-output">Set ai_rephrasing_enabled = false</span>
+
+<span class="term-comment"># View all settings</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--view</span></code></pre>
+
+      <h3>Via file</h3>
+
+      <p>Edit <code>~/.remind/config.json</code> directly:</p>
+
+<pre><code>{
+  <span class="term-string">"timezone"</span>: <span class="term-string">"America/New_York"</span>,
+  <span class="term-string">"scheduler_interval_minutes"</span>: <span class="term-output">5</span>,
+  <span class="term-string">"notifications_enabled"</span>: <span class="term-flag">true</span>,
+  <span class="term-string">"notification_sound_enabled"</span>: <span class="term-flag">true</span>,
+  <span class="term-string">"ai_rephrasing_enabled"</span>: <span class="term-flag">true</span>,
+  <span class="term-string">"nudge_intervals_minutes"</span>: [<span class="term-output">5</span>, <span class="term-output">15</span>, <span class="term-output">60</span>]
+}</code></pre>
+
+      <hr>
+
+      <h2>Database</h2>
+
+      <p>Reminders are stored in a local SQLite database:</p>
+
+      <table>
+        <thead><tr><th>Platform</th><th>Path</th></tr></thead>
+        <tbody>
+          <tr><td>macOS / Linux</td><td><code>~/.remind/remind.db</code></td></tr>
+          <tr><td>Windows</td><td><code>%USERPROFILE%\.remind\remind.db</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-label">Tip</div>
+        <p>The database is a standard SQLite file. You can query it directly with <code>sqlite3 ~/.remind/remind.db</code> for advanced use cases like bulk exports.</p>
+      </div>
+
+      <hr>
+
+      <h2>Environment variables</h2>
+
+      <p>These override config file values when set:</p>
+
+      <table>
+        <thead><tr><th>Variable</th><th>Overrides</th></tr></thead>
+        <tbody>
+          <tr><td><code>REMIND_OPENAI_API_KEY</code></td><td><code>openai_api_key</code></td></tr>
+          <tr><td><code>REMIND_BACKEND_URL</code></td><td><code>ai_backend_url</code></td></tr>
+          <tr><td><code>REMIND_TIMEZONE</code></td><td><code>timezone</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="doc-nav">
+        <a href="commands.html">
+          <div class="doc-nav-label">Previous</div>
+          <div class="doc-nav-title">Commands</div>
+        </a>
+        <a href="ai-features.html" class="next">
+          <div class="doc-nav-label">Next</div>
+          <div class="doc-nav-title">AI Features</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    toggle.addEventListener('click', () => { html.classList.toggle('dark'); localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</body>
+</html>

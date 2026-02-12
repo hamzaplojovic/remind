@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrations — Remind CLI</title>
+  <meta name="description" content="Integrate Remind into your workflow with shell aliases, cron jobs, git hooks, CI/CD pipelines, and more.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Young Serif"', 'Georgia', 'serif'],
+            body: ['Manrope', 'system-ui', 'sans-serif'],
+            mono: ['"Fira Code"', 'monospace'],
+          },
+          colors: {
+            paper: {
+              50: '#fdfcfa',
+              100: '#faf7f2',
+              200: '#f0ebe4',
+              300: '#d4cfc7',
+              400: '#b0a99e',
+              500: '#8a8279',
+              600: '#6b645c',
+              700: '#4a4540',
+              800: '#2a2724',
+              900: '#1a1715',
+              950: '#141211',
+            },
+            coral: {
+              DEFAULT: '#e8503a',
+              light: '#ff6b55',
+              dark: '#c43d2a',
+            },
+            sage: {
+              DEFAULT: '#2d6a4f',
+              light: '#52b788',
+              dark: '#1b4332',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* --- Theme Variables --- */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --bg-terminal: #1a1715;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --accent-secondary: #2d6a4f;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --bg-terminal: #0d0c0b;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --accent-secondary: #52b788;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* --- Base --- */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* --- Grain Texture Overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* --- Typography --- */
+    .font-display { font-family: 'Young Serif', Georgia, serif; }
+    .font-mono { font-family: 'Fira Code', monospace; }
+
+    /* --- Rules --- */
+    .rule {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      transition: background 0.5s ease;
+    }
+
+    /* --- Animations --- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* --- Buttons --- */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(232, 80, 58, 0.3);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* --- Theme Toggle --- */
+    .theme-toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(20px); }
+
+    /* --- Terminal Code Blocks --- */
+    .terminal-block {
+      background: #1a1715;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.5s ease;
+    }
+
+    html.dark .terminal-block {
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #f0ebe4;
+      overflow-x: auto;
+    }
+
+    .term-prompt { color: #e8503a; }
+    html.dark .term-prompt { color: #ff6b55; }
+    .term-cmd { color: #f0ebe4; }
+    .term-flag { color: #52b788; }
+    .term-string { color: #f0c674; }
+    .term-comment { color: #6b645c; }
+    .term-output { color: #b0a99e; }
+
+    /* --- Integration Section --- */
+    .integration-section {
+      padding: 4rem 0;
+    }
+
+    .integration-section + .integration-section {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .integration-number {
+      font-family: 'Young Serif', serif;
+      font-size: 3rem;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 1rem;
+      transition: color 0.5s ease;
+    }
+
+    /* --- Install Block --- */
+    .install-block {
+      background: var(--bg-terminal);
+      color: #f0ebe4;
+      padding: 1.25rem 1.5rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .install-block .copy-btn {
+      padding: 0.4rem 0.8rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #f0ebe4;
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .install-block .copy-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <nav class="sticky top-0 z-50 transition-colors duration-500" style="background: var(--bg); border-bottom: 1px solid var(--border);">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="flex items-center justify-between h-16">
+        <a href="index.html" class="font-display text-2xl tracking-tight" style="color: var(--text);">
+          remind<span style="color: var(--accent);">.</span>
+        </a>
+        <div class="hidden md:flex items-center gap-10">
+          <a href="docs/index.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Docs</a>
+          <a href="index.html#pricing" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Pricing</a>
+          <a href="compare.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Compare</a>
+          <a href="integrations.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--accent); letter-spacing: 0.08em;">Integrations</a>
+        </div>
+        <div class="flex items-center gap-5">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+          <a href="index.html#install" class="btn-primary text-sm hidden sm:inline-flex" style="padding: 0.6rem 1.5rem;">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pt-16 md:pt-24 pb-12 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-sm font-semibold tracking-widest uppercase mb-6 reveal" style="color: var(--accent); letter-spacing: 0.15em;">Integrations</p>
+      <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8 reveal reveal-delay-1" style="color: var(--text);">
+        Make Remind fit<br>your workflow.
+      </h1>
+      <p class="text-lg md:text-xl leading-relaxed max-w-2xl reveal reveal-delay-2" style="color: var(--text-secondary);">
+        Remind outputs JSON, accepts pipes, and plays well with every tool in your stack. Here are the most popular ways developers wire it into their daily routines.
+      </p>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
+
+  <!-- INTEGRATIONS -->
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+
+    <!-- 1. Shell Aliases -->
+    <div class="integration-section reveal" id="shell-aliases">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">01</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Shell Aliases</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Add these to your <code class="font-mono text-sm" style="color: var(--accent);">.bashrc</code>, <code class="font-mono text-sm" style="color: var(--accent);">.zshrc</code>, or shell config. Two-character commands for everything you do daily.
+          </p>
+          <p class="text-sm" style="color: var(--text-tertiary);">
+            Works with bash, zsh, fish, and any POSIX-compatible shell.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">~/.zshrc</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment"># Remind shortcuts</span></div>
+            <div><span class="term-cmd">alias</span> <span class="term-flag">ra</span>=<span class="term-string">'remind add'</span></div>
+            <div><span class="term-cmd">alias</span> <span class="term-flag">rl</span>=<span class="term-string">'remind list'</span></div>
+            <div><span class="term-cmd">alias</span> <span class="term-flag">rd</span>=<span class="term-string">'remind done'</span></div>
+            <div><span class="term-cmd">alias</span> <span class="term-flag">rs</span>=<span class="term-string">'remind search'</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Cron Jobs -->
+    <div class="integration-section reveal" id="cron-jobs">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">02</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Cron Jobs</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Schedule a daily digest of your reminders. Pipe the JSON output through <code class="font-mono text-sm" style="color: var(--accent);">jq</code> to format it however you want -- terminal, email, Slack webhook, you name it.
+          </p>
+          <p class="text-sm" style="color: var(--text-tertiary);">
+            Add to your crontab with <code class="font-mono text-sm" style="color: var(--text-tertiary);">crontab -e</code>.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">crontab</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment"># Daily reminder summary at 9am</span></div>
+            <div><span class="term-string">0 9 * * *</span> <span class="term-cmd">remind list</span> <span class="term-flag">--json</span> | <span class="term-cmd">jq</span> <span class="term-string">'.[].text'</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Git Hooks -->
+    <div class="integration-section reveal" id="git-hooks">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">03</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Git Hooks</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Automatically create a reminder every time you check out a new branch. Never forget to review, merge, or clean up feature branches again.
+          </p>
+          <p class="text-sm" style="color: var(--text-tertiary);">
+            Drop this into <code class="font-mono text-sm" style="color: var(--text-tertiary);">.git/hooks/post-checkout</code> and make it executable.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">.git/hooks/post-checkout</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment">#!/bin/bash</span></div>
+            <div><span class="term-comment"># Auto-remind on branch checkout</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-cmd">remind add</span> <span class="term-string">"Review and merge $(git branch --show-current)"</span> \</div>
+            <div>&nbsp;&nbsp;<span class="term-flag">--due</span> <span class="term-string">"in 2 days"</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. CI/CD -->
+    <div class="integration-section reveal" id="ci-cd">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">04</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">CI/CD</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Add Remind steps to your GitHub Actions, GitLab CI, or any pipeline. Create reminders to verify deployments, follow up on releases, or notify your team.
+          </p>
+          <p class="text-sm" style="color: var(--text-tertiary);">
+            Works anywhere a shell command runs.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">.github/workflows/deploy.yml</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-flag">steps</span><span class="term-output">:</span></div>
+            <div>&nbsp;&nbsp;<span class="term-output">-</span> <span class="term-flag">name</span><span class="term-output">:</span> <span class="term-string">Deploy to production</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-flag">run</span><span class="term-output">:</span> <span class="term-cmd">make deploy</span></div>
+            <div>&nbsp;</div>
+            <div>&nbsp;&nbsp;<span class="term-output">-</span> <span class="term-flag">name</span><span class="term-output">:</span> <span class="term-string">Remind team about deploy</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-flag">run</span><span class="term-output">:</span> <span class="term-cmd">remind add</span> <span class="term-string">"Verify production deploy"</span> <span class="term-flag">--priority</span> <span class="term-string">high</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Raycast / Alfred -->
+    <div class="integration-section reveal" id="launchers">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">05</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Raycast / Alfred</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Create a custom script command in Raycast or Alfred to quick-add reminders from anywhere on your Mac. Hit your hotkey, type the reminder, and you are done -- without opening a terminal.
+          </p>
+          <p class="text-sm mb-4" style="color: var(--text-tertiary);">
+            In Raycast, create a Script Command. In Alfred, create a Workflow with a keyword trigger and a "Run Script" action.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">remind-add.sh (Raycast Script Command)</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment">#!/bin/bash</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-comment"># @raycast.schemaVersion 1</span></div>
+            <div><span class="term-comment"># @raycast.title Add Reminder</span></div>
+            <div><span class="term-comment"># @raycast.argument1 { "type": "text", "placeholder": "reminder" }</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-cmd">remind add</span> <span class="term-string">"$1"</span></div>
+            <div><span class="term-cmd">echo</span> <span class="term-string">"Reminder added."</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Piping & Scripting -->
+    <div class="integration-section reveal" id="piping">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">06</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Piping and Scripting</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Remind's <code class="font-mono text-sm" style="color: var(--accent);">--json</code> flag outputs structured data you can pipe into any tool. Filter overdue items, count by priority, build dashboards -- the Unix way.
+          </p>
+          <p class="text-sm" style="color: var(--text-tertiary);">
+            Combine with <code class="font-mono text-sm" style="color: var(--text-tertiary);">jq</code>, <code class="font-mono text-sm" style="color: var(--text-tertiary);">awk</code>, <code class="font-mono text-sm" style="color: var(--text-tertiary);">grep</code>, or any language you prefer.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">remind -- zsh</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment"># Get overdue reminders</span></div>
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind list</span> <span class="term-flag">--json</span> | <span class="term-cmd">jq</span> <span class="term-string">'[.[] | select(.due_at &lt; now)]'</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-comment"># Count by priority</span></div>
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind list</span> <span class="term-flag">--json</span> | <span class="term-cmd">jq</span> \</div>
+            <div>&nbsp;&nbsp;<span class="term-string">'group_by(.priority) | map({(.[0].priority): length})'</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-comment"># Export to CSV</span></div>
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind list</span> <span class="term-flag">--json</span> | <span class="term-cmd">jq</span> <span class="term-flag">-r</span> \</div>
+            <div>&nbsp;&nbsp;<span class="term-string">'.[] | [.id, .text, .due_at, .priority] | @csv'</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
+
+  <!-- CTA -->
+  <section class="py-24 md:py-32 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="max-w-2xl mx-auto reveal">
+        <h2 class="font-display text-4xl md:text-5xl leading-tight mb-8" style="color: var(--text);">
+          Build your own integrations.
+        </h2>
+        <p class="text-lg leading-relaxed mb-10" style="color: var(--text-secondary);">
+          Remind is a CLI. If it runs in a shell, it works with Remind. Install it and start wiring things together.
+        </p>
+        <div class="flex flex-wrap gap-4 justify-center mb-10">
+          <a href="index.html#install" class="btn-primary">
+            Install Remind
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="docs/index.html" class="btn-secondary">Read the Docs</a>
+        </div>
+        <div class="install-block max-w-md mx-auto">
+          <code><span style="color:#52b788;">$</span> brew install remind-cli</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('brew install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top: 1px solid var(--border); transition: border-color 0.5s ease;">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+      <div class="grid md:grid-cols-4 gap-12 mb-16">
+        <div>
+          <p class="font-display text-xl mb-4" style="color: var(--text);">remind<span style="color: var(--accent);">.</span></p>
+          <p class="text-sm leading-relaxed" style="color: var(--text-tertiary);">AI-powered reminders<br>for the terminal.</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Product</p>
+          <ul class="space-y-3">
+            <li><a href="index.html#features" class="text-sm transition-colors" style="color: var(--text-tertiary);">Features</a></li>
+            <li><a href="index.html#pricing" class="text-sm transition-colors" style="color: var(--text-tertiary);">Pricing</a></li>
+            <li><a href="compare.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Compare</a></li>
+            <li><a href="integrations.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Integrations</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Resources</p>
+          <ul class="space-y-3">
+            <li><a href="docs/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Documentation</a></li>
+            <li><a href="blog/" class="text-sm transition-colors" style="color: var(--text-tertiary);">Blog</a></li>
+            <li><a href="index.html#contact" class="text-sm transition-colors" style="color: var(--text-tertiary);">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Legal</p>
+          <ul class="space-y-3">
+            <li><a href="privacy.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Privacy Policy</a></li>
+            <li><a href="terms.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="rule mb-8">
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">Built with care for the terminal.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // --- Theme Toggle ---
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // --- Scroll Reveal ---
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    // --- Smooth Scroll ---
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

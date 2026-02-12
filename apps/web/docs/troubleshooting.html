@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troubleshooting — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link">Overview</a>
+        <a href="getting-started.html" class="sidebar-link">Installation</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link">Commands</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link active">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="sep">/</span>
+        Troubleshooting
+      </div>
+
+      <h1>Troubleshooting</h1>
+
+      <p class="lead">Common issues and how to resolve them. Start with <code>remind doctor</code> — it catches most problems automatically.</p>
+
+      <hr>
+
+      <h2>The doctor command</h2>
+
+      <p>Always start here. It checks database, configuration, authentication, and accessibility:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind doctor</span>
+
+<span class="term-output">remind.</span>
+<span class="term-output">DIAGNOSTICS</span>
+<span class="term-output">────────────────────────────────────────────</span>
+  <span class="term-output">DATABASE           </span><span class="term-success">✓ connected</span>
+  <span class="term-output">CONFIGURATION      </span><span class="term-success">✓ valid</span>
+  <span class="term-output">LICENSE TOKEN      </span><span class="term-success">✓ authenticated</span>
+  <span class="term-output">REMINDERS          </span><span class="term-success">✓ accessible</span>
+
+<span class="term-output">────────────────────────────────────────────</span>
+  <span class="term-success">✓</span> <span class="term-output">All checks passed.</span></code></pre>
+
+      <p>If any check fails, the error message tells you what's wrong and how to fix it.</p>
+
+      <hr>
+
+      <h2>Common issues</h2>
+
+      <h3>"command not found: remind"</h3>
+
+      <p>The <code>remind</code> binary isn't in your PATH.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ul>
+        <li>If installed via Homebrew: run <code>brew link remind</code></li>
+        <li>If installed via pip: ensure your Python scripts directory is in PATH</li>
+        <li>Check with: <code>which remind</code> or <code>pip show remind-cli</code></li>
+      </ul>
+
+      <hr>
+
+      <h3>"Database error" or "could not connect"</h3>
+
+      <p>The SQLite database is corrupted or inaccessible.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ul>
+        <li>Check permissions: <code>ls -la ~/.remind/</code></li>
+        <li>Verify the file exists: <code>ls ~/.remind/remind.db</code></li>
+        <li>If corrupted, remove and Remind will recreate it: <code>rm ~/.remind/remind.db</code></li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-label">Warning</div>
+        <p>Removing the database deletes all reminders. Back up the file first if you want to recover data.</p>
+      </div>
+
+      <hr>
+
+      <h3>"Invalid token format"</h3>
+
+      <p>Your license token doesn't start with <code>remind_</code>.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ul>
+        <li>Make sure you're using the full token, e.g. <code>remind_indie_abc123xyz789</code></li>
+        <li>Copy the token from your account dashboard at remind.dev</li>
+        <li>Re-login: <code>remind login remind_indie_abc123xyz789</code></li>
+      </ul>
+
+      <hr>
+
+      <h3>"AI suggestion failed"</h3>
+
+      <p>The AI backend is unreachable or your quota is exhausted.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ul>
+        <li>Check your internet connection</li>
+        <li>Verify quota with <code>remind report</code></li>
+        <li>Check if using a custom backend URL: <code>remind settings --view</code></li>
+        <li>Reminders are still created without AI — use <code>--no-ai</code> as a workaround</li>
+      </ul>
+
+      <hr>
+
+      <h3>"Could not parse due date"</h3>
+
+      <p>The natural language date parser couldn't understand your input.</p>
+
+      <p><strong>Fix:</strong> Try more explicit formats:</p>
+
+<pre><code><span class="term-comment"># These work:</span>
+<span class="term-flag">--due</span> <span class="term-string">"tomorrow 5pm"</span>
+<span class="term-flag">--due</span> <span class="term-string">"friday"</span>
+<span class="term-flag">--due</span> <span class="term-string">"2025-03-15 14:00"</span>
+<span class="term-flag">--due</span> <span class="term-string">"in 2 hours"</span>
+<span class="term-flag">--due</span> <span class="term-string">"next monday 9am"</span>
+
+<span class="term-comment"># These may not work:</span>
+<span class="term-flag">--due</span> <span class="term-string">"whenever"</span>
+<span class="term-flag">--due</span> <span class="term-string">"soon"</span></code></pre>
+
+      <hr>
+
+      <h3>Notifications not appearing</h3>
+
+      <p>The scheduler might not be running, or OS permissions are blocking notifications.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ol>
+        <li>Check scheduler status: <code>remind scheduler --status</code></li>
+        <li>Enable if not running: <code>remind scheduler --enable</code></li>
+        <li>Verify notifications are enabled in settings: <code>remind settings --view</code></li>
+        <li><strong>macOS:</strong> Check System Settings &gt; Notifications &gt; Remind</li>
+        <li><strong>Linux:</strong> Ensure <code>notify-send</code> is installed</li>
+        <li><strong>Windows:</strong> Check notification center settings</li>
+      </ol>
+
+      <hr>
+
+      <h3>Config file is corrupted</h3>
+
+      <p>Invalid JSON in the config file.</p>
+
+      <p><strong>Fix:</strong> Reset to defaults by removing the config file:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">rm ~/.remind/config.json</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind doctor</span>
+  <span class="term-output">CONFIGURATION      </span><span class="term-success">✓ valid</span></code></pre>
+
+      <p>Remind creates a fresh config on next run.</p>
+
+      <hr>
+
+      <h2>Reset everything</h2>
+
+      <p>To completely reset Remind to factory state:</p>
+
+<pre><code><span class="term-comment"># Back up your data first</span>
+<span class="term-prompt">$</span> <span class="term-cmd">cp ~/.remind/remind.db ~/remind-backup.db</span>
+
+<span class="term-comment"># Remove all data</span>
+<span class="term-prompt">$</span> <span class="term-cmd">rm -rf ~/.remind/</span>
+
+<span class="term-comment"># Verify clean state</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind doctor</span></code></pre>
+
+      <hr>
+
+      <h2>Getting help</h2>
+
+      <p>If none of the above resolves your issue:</p>
+
+      <ul>
+        <li><strong>GitHub Issues:</strong> File a bug at <a href="https://github.com/hamzaplojovic/remind/issues">github.com/hamzaplojovic/remind/issues</a></li>
+        <li><strong>Email:</strong> <a href="mailto:hello@remind.dev">hello@remind.dev</a></li>
+        <li><strong>Twitter:</strong> @RemindCLI</li>
+      </ul>
+
+      <p>When reporting a bug, include the output of:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind doctor</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--view</span>
+<span class="term-prompt">$</span> <span class="term-cmd">python --version</span></code></pre>
+
+      <div class="doc-nav">
+        <a href="ai-features.html">
+          <div class="doc-nav-label">Previous</div>
+          <div class="doc-nav-title">AI Features</div>
+        </a>
+        <div></div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    toggle.addEventListener('click', () => { html.classList.toggle('dark'); localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</body>
+</html>

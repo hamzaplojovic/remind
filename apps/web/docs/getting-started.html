@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link">Overview</a>
+        <a href="getting-started.html" class="sidebar-link active">Installation</a>
+        <a href="getting-started.html#quickstart" class="sidebar-link sub">Quickstart</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link">Commands</a>
+        <a href="commands.html#add" class="sidebar-link sub">add</a>
+        <a href="commands.html#list" class="sidebar-link sub">list</a>
+        <a href="commands.html#done" class="sidebar-link sub">done</a>
+        <a href="commands.html#search" class="sidebar-link sub">search</a>
+        <a href="commands.html#more" class="sidebar-link sub">more...</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="sep">/</span>
+        Getting Started
+      </div>
+
+      <h1>Getting Started</h1>
+
+      <p class="lead">Install Remind and create your first reminder in under a minute.</p>
+
+      <hr>
+
+      <h2>Requirements</h2>
+
+      <ul>
+        <li><strong>Python 3.12+</strong> (if installing via pip)</li>
+        <li><strong>macOS, Linux, or Windows</strong></li>
+        <li>Internet connection for AI features (optional)</li>
+      </ul>
+
+      <h2>Installation</h2>
+
+      <h3>Homebrew (macOS &amp; Linux)</h3>
+
+      <p>The recommended way to install on macOS and Linux:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">brew install remind-cli</span></code></pre>
+
+      <h3>pip</h3>
+
+      <p>Install from PyPI into any Python 3.12+ environment:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">pip install remind-cli</span></code></pre>
+
+      <h3>Shell script</h3>
+
+      <p>One-liner that detects your OS and installs the appropriate binary:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">curl -fsSL remind.dev/install | sh</span></code></pre>
+
+      <h3>From source</h3>
+
+      <p>Clone the repo and install with <code>uv</code>:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">git clone https://github.com/hamzaplojovic/remind.git</span>
+<span class="term-prompt">$</span> <span class="term-cmd">cd remind</span>
+<span class="term-prompt">$</span> <span class="term-cmd">uv sync --all-extras</span></code></pre>
+
+      <h3>Verify installation</h3>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind --help</span>
+<span class="term-output">Usage: remind [OPTIONS] COMMAND [ARGS]...</span>
+<span class="term-output">Remind: AI-powered reminder CLI</span></code></pre>
+
+      <div class="callout tip">
+        <div class="callout-label">Tip</div>
+        <p>Run <code>remind doctor</code> after installation to verify everything is working correctly.</p>
+      </div>
+
+      <hr>
+
+      <h2 id="quickstart">Quickstart</h2>
+
+      <h3>1. Create a reminder</h3>
+
+      <p>Use natural language. Remind parses intent, timing, and priority:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"buy groceries tonight"</span>
+  <span class="term-output">AI</span>  <span class="term-string">Buy groceries tonight at 7:00 PM</span>
+  <span class="term-success">✓</span> <span class="term-output">Reminder saved (#1)</span></code></pre>
+
+      <p>Add flags for more control:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"review PR"</span> <span class="term-flag">--due</span> <span class="term-string">"friday 5pm"</span> <span class="term-flag">--priority</span> <span class="term-string">high</span></code></pre>
+
+      <h3>2. List reminders</h3>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind list</span>
+
+  <span class="term-output">ID   TEXT                      DUE              PRI</span>
+  <span class="term-output"> 1   Buy groceries             tonight 7pm      MED</span>
+  <span class="term-output"> 2   Review PR                 Friday 5pm       HIGH</span>
+
+  <span class="term-output">2 reminders</span></code></pre>
+
+      <h3>3. Complete a reminder</h3>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind done</span> <span class="term-string">1</span>
+  <span class="term-success">✓</span> <span class="term-output">Done: Buy groceries</span></code></pre>
+
+      <h3>4. Search</h3>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind search</span> <span class="term-string">"PR"</span>
+
+  <span class="term-output">ID   TEXT                      DUE              PRI</span>
+  <span class="term-output"> 2   Review PR                 Friday 5pm       HIGH</span>
+
+  <span class="term-output">1 reminder</span></code></pre>
+
+      <hr>
+
+      <h2>Optional: Authenticate</h2>
+
+      <p>To unlock AI features beyond the free tier, log in with your license token:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind login</span> <span class="term-string">remind_indie_abc123xyz789</span>
+  <span class="term-success">✓</span> <span class="term-output">Logged in successfully</span>
+  <span class="term-output">PLAN               Indie</span></code></pre>
+
+      <p>Get your token at <a href="../index.html#pricing">remind.dev/pricing</a>.</p>
+
+      <h2>Optional: Enable background notifications</h2>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> <span class="term-flag">--enable</span>
+  <span class="term-success">✓</span> <span class="term-output">Scheduler enabled</span>
+  <span class="term-output">Will check reminders every 5 minutes</span></code></pre>
+
+      <div class="callout">
+        <div class="callout-label">Note</div>
+        <p>The scheduler requires the Indie plan or higher. It runs as a background process and delivers native OS notifications.</p>
+      </div>
+
+      <!-- Prev/Next -->
+      <div class="doc-nav">
+        <a href="index.html">
+          <div class="doc-nav-label">Previous</div>
+          <div class="doc-nav-title">Overview</div>
+        </a>
+        <a href="commands.html" class="next">
+          <div class="doc-nav-label">Next</div>
+          <div class="doc-nav-title">Commands</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    toggle.addEventListener('click', () => { html.classList.toggle('dark'); localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</body>
+</html>

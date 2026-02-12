@@ -1,0 +1,116 @@
+name: Validate Homebrew Formula
+
+on:
+  workflow_call:
+    inputs:
+      binary-name:
+        required: true
+        type: string
+      download-url:
+        required: true
+        type: string
+      sha256:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+
+jobs:
+  validate:
+    name: Validate ${{ inputs.binary-name }}
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download binary
+        run: |
+          cd /tmp
+          wget "${{ inputs.download-url }}" -O binary
+          chmod +x binary
+
+      - name: Verify checksum
+        run: |
+          EXPECTED="${{ inputs.sha256 }}"
+          ACTUAL=$(shasum -a 256 /tmp/binary | awk '{print $1}')
+
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "❌ Checksum mismatch!"
+            echo "Expected: $EXPECTED"
+            echo "Actual:   $ACTUAL"
+            exit 1
+          fi
+          echo "✓ Checksum verified"
+
+      - name: Test binary execution
+        run: |
+          /tmp/binary --version || exit 1
+          /tmp/binary --help || exit 1
+          echo "✓ Binary executes correctly"
+
+      - name: Check binary size
+        run: |
+          SIZE=$(stat -f%z /tmp/binary 2>/dev/null || stat -c%s /tmp/binary)
+          SIZE_MB=$((SIZE / 1024 / 1024))
+
+          if [ "$SIZE_MB" -lt 10 ] || [ "$SIZE_MB" -gt 200 ]; then
+            echo "⚠ Warning: Binary size is ${SIZE_MB}MB (expected 20-100MB)"
+          fi
+          echo "✓ Binary size: ${SIZE_MB}MB"
+
+      - name: Verify formula syntax
+        run: |
+          cd apps/cli
+          python3 -c "
+          import sys
+          with open('build_tools/homebrew_formula.rb', 'r') as f:
+              content = f.read()
+              if '${{ inputs.version }}' not in content:
+                  print(f'❌ Formula missing version ${{ inputs.version }}')
+                  sys.exit(1)
+              if '${{ inputs.sha256 }}' not in content:
+                  print(f'❌ Formula missing correct SHA256')
+                  sys.exit(1)
+              if 'class RemindCli' not in content:
+                  print('❌ Formula missing RemindCli class')
+                  sys.exit(1)
+          print('✓ Formula syntax valid')
+          "
+
+      - name: Check for security issues
+        run: |
+          BINARY_TYPE=$(/usr/bin/file /tmp/binary)
+          echo "Binary type: $BINARY_TYPE"
+
+          # Verify it's a valid executable
+          if ! echo "$BINARY_TYPE" | grep -qE "(Mach-O|ELF)"; then
+            echo "❌ Invalid binary format"
+            exit 1
+          fi
+          echo "✓ Binary format valid"
+
+      - name: Test installation simulation
+        run: |
+          # Create temp install location
+          TEMP_BIN=$(mktemp)
+          cp /tmp/binary "$TEMP_BIN"
+          chmod +x "$TEMP_BIN"
+
+          # Test it runs
+          if ! "$TEMP_BIN" --version > /dev/null 2>&1; then
+            echo "❌ Binary failed to run after copy"
+            exit 1
+          fi
+          echo "✓ Installation simulation successful"
+          rm -f "$TEMP_BIN"
+
+      - name: Report validation results
+        run: |
+          echo "✅ All validations passed for ${{ inputs.binary-name }}"
+          echo ""
+          echo "Validation Summary:"
+          echo "  Binary:    ${{ inputs.binary-name }}"
+          echo "  Version:   ${{ inputs.version }}"
+          echo "  SHA256:    ${{ inputs.sha256 }}"
+          echo "  Download:  ${{ inputs.download-url }}"

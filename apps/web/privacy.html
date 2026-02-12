@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Remind</title>
+  <meta name="description" content="Remind's privacy policy. How we collect, use, and protect your data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme Variables --- */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* --- Base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      line-height: 1.7;
+    }
+
+    /* --- Grain Texture Overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* --- Theme Toggle --- */
+    .theme-toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(20px); }
+
+    /* --- Legal Document Styles --- */
+    .legal-content h1 {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .legal-content .effective-date {
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      margin-bottom: 3rem;
+    }
+
+    .legal-content h2 {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .legal-content h2:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .legal-content p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .legal-content ul {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      padding-left: 1.25rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .legal-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .legal-content strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .legal-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: opacity 0.2s ease;
+    }
+
+    .legal-content a:hover {
+      opacity: 0.8;
+    }
+
+    .legal-content code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      background: var(--border-light);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      transition: background 0.5s ease;
+    }
+
+    /* --- Footer --- */
+    footer {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <nav style="position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border);transition:background 0.5s ease,border-color 0.5s ease;">
+    <div style="max-width:780px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" style="font-family:'Young Serif',serif;font-size:1.35rem;color:var(--text);text-decoration:none;">remind<span style="color:var(--accent);">.</span></a>
+      <div style="display:flex;align-items:center;gap:1.5rem;">
+        <a href="docs/index.html" style="font-size:0.85rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;">Docs</a>
+        <a href="index.html#pricing" style="font-size:0.85rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;">Pricing</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="legal-content" style="max-width:780px;margin:0 auto;padding:3rem 2rem 4rem;">
+    <h1>Privacy Policy</h1>
+    <p class="effective-date">Effective date: January 1, 2025</p>
+
+    <p>Remind ("we", "us", "our") is an AI-powered reminder CLI. This policy explains what data we collect, how we use it, and the choices you have. We wrote this in plain language because you should not need a law degree to understand how your data is handled.</p>
+
+    <h2>What We Collect</h2>
+    <p>Remind is designed to be local-first. The vast majority of your data never leaves your machine.</p>
+    <ul>
+      <li><strong>Reminder data.</strong> All reminders you create are stored locally in a SQLite database on your device. We do not have access to this data and do not store it on our servers.</li>
+      <li><strong>Account credentials.</strong> If you sign up for a paid plan, we store your email address and a hashed license token. We do not store passwords -- authentication is token-based.</li>
+      <li><strong>Usage analytics.</strong> We collect anonymous, aggregate usage counts: how many reminders were created, how many AI suggestions were used, and which CLI commands are most popular. We do not collect the content of your reminders.</li>
+      <li><strong>Device metadata.</strong> Operating system type, CLI version, and locale. This helps us prioritize platform-specific fixes.</li>
+    </ul>
+
+    <h2>How We Use It</h2>
+    <ul>
+      <li>To authenticate your license and enforce plan limits (AI suggestion quotas, feature gating).</li>
+      <li>To improve the product by understanding usage patterns at an aggregate level.</li>
+      <li>To send transactional emails such as license confirmations, billing receipts, and critical security notices. We do not send marketing emails unless you opt in.</li>
+      <li>To diagnose and resolve issues when you contact support.</li>
+    </ul>
+
+    <h2>AI &amp; Data Processing</h2>
+    <p>When you use AI-powered features (smart scheduling, priority suggestions, natural language parsing), the text of your reminder is sent to our API, which forwards it to a third-party AI provider for processing. This happens <strong>only when AI features are explicitly enabled</strong> in your configuration.</p>
+    <ul>
+      <li>Reminder text is sent over an encrypted (TLS 1.3) connection.</li>
+      <li>Neither we nor our AI provider permanently store the reminder text. It is processed in memory and discarded.</li>
+      <li>AI providers are contractually prohibited from using your data to train models.</li>
+      <li>You can disable AI features entirely by running <code>remind config set ai.enabled false</code>. When disabled, zero data is sent to external services.</li>
+    </ul>
+
+    <h2>Third Parties</h2>
+    <p>We share data only with the following categories of service providers, and only to the extent necessary:</p>
+    <ul>
+      <li><strong>AI processing.</strong> Reminder text (when AI is enabled) is sent to our AI provider for real-time inference. No permanent storage.</li>
+      <li><strong>Payment processing.</strong> Billing is handled by Stripe. We never see or store your full credit card number.</li>
+      <li><strong>Infrastructure.</strong> Our API runs on cloud infrastructure providers (e.g., AWS, Fly.io). All data is encrypted at rest and in transit.</li>
+    </ul>
+    <p>We do not sell your data. We do not share it with advertisers. We do not broker data in any form.</p>
+
+    <h2>Data Storage &amp; Security</h2>
+    <ul>
+      <li><strong>Local storage.</strong> Reminders live in a SQLite database at <code>~/.remind/remind.db</code>. This file is yours. Back it up, move it, delete it -- we have no access to it.</li>
+      <li><strong>Server-side storage.</strong> License tokens and aggregate analytics are stored in a PostgreSQL database with encryption at rest (AES-256). Access is restricted to authenticated internal services.</li>
+      <li><strong>Transmission.</strong> All communication between the CLI and our API uses TLS 1.3. API keys are rotated regularly.</li>
+      <li><strong>Retention.</strong> Aggregate analytics are retained indefinitely. Account data is deleted within 30 days of account closure. AI request logs (metadata only, no content) are purged after 90 days.</li>
+    </ul>
+
+    <h2>Your Rights</h2>
+    <p>Depending on your jurisdiction, you may have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> the personal data we hold about you.</li>
+      <li><strong>Delete</strong> your account and all associated data.</li>
+      <li><strong>Export</strong> your data. Run <code>remind export</code> to get a full JSON dump of your local database at any time.</li>
+      <li><strong>Opt out</strong> of analytics collection by running <code>remind config set analytics.enabled false</code>.</li>
+      <li><strong>Restrict processing</strong> by disabling AI features.</li>
+    </ul>
+    <p>To exercise any of these rights, email us at <a href="mailto:privacy@remind.dev">privacy@remind.dev</a>. We respond within 15 business days.</p>
+
+    <h2>Cookies</h2>
+    <p>The Remind CLI does not use cookies. Our website (<a href="https://remind.dev">remind.dev</a>) uses a single, first-party cookie to remember your theme preference (light or dark mode). We do not use tracking cookies, advertising pixels, or third-party analytics scripts on our website.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this policy from time to time. When we make material changes, we will notify users via the CLI (<code>remind</code> will display a notice on next run) and update the effective date at the top of this page. Continued use of the service after changes constitutes acceptance of the revised policy.</p>
+
+    <h2>Contact</h2>
+    <p>If you have questions about this privacy policy or how your data is handled:</p>
+    <ul>
+      <li>Email: <a href="mailto:privacy@remind.dev">privacy@remind.dev</a></li>
+      <li>GitHub: <a href="https://github.com/remind-cli/remind">remind-cli/remind</a></li>
+      <li>Twitter: <a href="https://twitter.com/RemindCLI">@RemindCLI</a></li>
+    </ul>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="max-width:780px;margin:0 auto;padding:2rem;text-align:center;">
+      <p style="font-size:0.85rem;color:var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Theme Toggle
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

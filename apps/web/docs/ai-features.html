@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Features — Remind CLI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <div class="top-nav-inner">
+      <a href="../index.html" class="logo">remind<span>.</span></a>
+      <div class="top-nav-links">
+        <a href="index.html" class="active">Docs</a>
+        <a href="../index.html#pricing">Pricing</a>
+        <a href="../index.html#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a href="index.html" class="sidebar-link">Overview</a>
+        <a href="getting-started.html" class="sidebar-link">Installation</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reference</div>
+        <a href="commands.html" class="sidebar-link">Commands</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Guides</div>
+        <a href="configuration.html" class="sidebar-link">Configuration</a>
+        <a href="ai-features.html" class="sidebar-link active">AI Features</a>
+        <a href="troubleshooting.html" class="sidebar-link">Troubleshooting</a>
+      </div>
+    </aside>
+
+    <main class="doc-content">
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="sep">/</span>
+        AI Features
+      </div>
+
+      <h1>AI Features</h1>
+
+      <p class="lead">Remind uses AI to transform rough input into well-structured reminders with optimal timing and priority. Here's how it works and how to control it.</p>
+
+      <hr>
+
+      <h2>How it works</h2>
+
+      <p>When you run <code>remind add</code>, the AI processes your text in three ways:</p>
+
+      <ol>
+        <li><strong>Text refinement</strong> — Cleans up grammar, capitalization, and phrasing while preserving your intent</li>
+        <li><strong>Time suggestion</strong> — Infers optimal due time from context ("tomorrow" becomes a specific datetime)</li>
+        <li><strong>Priority assignment</strong> — Assigns high/medium/low based on urgency signals in the text</li>
+      </ol>
+
+      <h3>Example flow</h3>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"call mom tmrw"</span>
+
+<span class="term-comment">  Input     → "call mom tmrw"</span>
+<span class="term-comment">  Refined   → "Call mom tomorrow at 3:00 PM"</span>
+<span class="term-comment">  Due       → Tomorrow, 3:00 PM</span>
+<span class="term-comment">  Priority  → High</span>
+
+  <span class="term-output">AI</span>  <span class="term-string">Call mom tomorrow at 3:00 PM</span>
+  <span class="term-success">✓</span> <span class="term-output">Reminder saved (#4)</span></code></pre>
+
+      <p>The AI suggestion is shown before saving. The original text is preserved in the database alongside the AI-enhanced version.</p>
+
+      <hr>
+
+      <h2>Quotas by plan</h2>
+
+      <p>AI suggestions consume quota based on your plan tier:</p>
+
+      <table>
+        <thead><tr><th>Plan</th><th>AI Suggestions / Month</th><th>Price</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Free</strong></td><td>5</td><td>$0</td></tr>
+          <tr><td><strong>Indie</strong></td><td>100</td><td>$5/mo</td></tr>
+          <tr><td><strong>Pro</strong></td><td>1,000</td><td>$15/mo</td></tr>
+          <tr><td><strong>Team</strong></td><td>5,000+</td><td>$50/mo</td></tr>
+        </tbody>
+      </table>
+
+      <p>Check your remaining quota:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind report</span>
+  <span class="term-output">AI SUGGESTIONS USED  12</span>
+  <span class="term-output">PLAN                 Indie — 100 AI suggestions/month</span></code></pre>
+
+      <div class="callout tip">
+        <div class="callout-label">Tip</div>
+        <p>When quota runs out, reminders are still created — they just skip the AI step. You'll see a warning in the output.</p>
+      </div>
+
+      <hr>
+
+      <h2>Disabling AI</h2>
+
+      <h3>Per-command</h3>
+
+      <p>Skip AI for a single reminder with <code>--no-ai</code>:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind add</span> <span class="term-string">"exact text I want"</span> <span class="term-flag">--no-ai</span></code></pre>
+
+      <h3>Globally</h3>
+
+      <p>Disable AI for all reminders:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">ai_rephrasing_enabled=false</span></code></pre>
+
+      <p>Re-enable anytime:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">ai_rephrasing_enabled=true</span></code></pre>
+
+      <hr>
+
+      <h2>Using your own API key</h2>
+
+      <p>By default, AI requests go through the Remind backend API. You can use your own OpenAI key for direct access:</p>
+
+<pre><code><span class="term-comment"># Via settings</span>
+<span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">openai_api_key=sk-...</span>
+
+<span class="term-comment"># Or via environment variable</span>
+<span class="term-prompt">$</span> <span class="term-cmd">export REMIND_OPENAI_API_KEY=</span><span class="term-string">sk-...</span></code></pre>
+
+      <div class="callout warning">
+        <div class="callout-label">Important</div>
+        <p>When using your own key, AI suggestions are billed directly to your OpenAI account and do not count against your Remind plan quota.</p>
+      </div>
+
+      <hr>
+
+      <h2>Custom backend</h2>
+
+      <p>Point Remind at a self-hosted or custom AI backend:</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind settings</span> <span class="term-flag">--set</span> <span class="term-string">ai_backend_url=https://your-api.example.com</span></code></pre>
+
+      <p>The backend must implement the <code>POST /api/v1/suggest-reminder</code> endpoint. See the <a href="https://github.com/hamzaplojovic/remind">backend source</a> for the API contract.</p>
+
+      <hr>
+
+      <h2>Privacy</h2>
+
+      <ul>
+        <li>Reminder text is sent to the AI backend only when AI is enabled</li>
+        <li>Reminder text is never stored on remote servers beyond request processing</li>
+        <li>Use <code>--no-ai</code> for sensitive reminders</li>
+        <li>Self-host the backend for full data control</li>
+      </ul>
+
+      <div class="doc-nav">
+        <a href="configuration.html">
+          <div class="doc-nav-label">Previous</div>
+          <div class="doc-nav-title">Configuration</div>
+        </a>
+        <a href="troubleshooting.html" class="next">
+          <div class="doc-nav-label">Next</div>
+          <div class="doc-nav-title">Troubleshooting</div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
+    toggle.addEventListener('click', () => { html.classList.toggle('dark'); localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</body>
+</html>

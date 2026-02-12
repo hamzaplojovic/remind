@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Remind</title>
+  <meta name="description" content="Page not found — Remind CLI">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ——— Theme Variables ——— */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --bg-terminal: #1a1715;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --accent-secondary: #2d6a4f;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --bg-terminal: #0d0c0b;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --accent-secondary: #52b788;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* ——— Base ——— */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ——— Grain Texture Overlay ——— */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* ——— Content ——— */
+    .container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 560px;
+      width: 100%;
+    }
+
+    .logo {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.75rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      margin-bottom: 3rem;
+      display: block;
+    }
+
+    .logo-dot {
+      color: var(--accent);
+    }
+
+    .error-code {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: clamp(6rem, 15vw, 10rem);
+      line-height: 1;
+      color: var(--border);
+      margin-bottom: 1.5rem;
+      user-select: none;
+      transition: color 0.5s ease;
+    }
+
+    .message {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    /* ——— Terminal Block ——— */
+    .terminal {
+      background: var(--bg-terminal);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 3rem;
+      text-align: left;
+      transition: box-shadow 0.5s ease;
+    }
+
+    html.dark .terminal {
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #f0ebe4;
+    }
+
+    .term-prompt { color: var(--accent); }
+    .term-cmd { color: #f0ebe4; }
+    .term-string { color: #f0c674; }
+    .term-error { color: #e8503a; }
+    .term-output { color: #b0a99e; }
+
+    /* ——— Button ——— */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: var(--accent);
+      color: white;
+      font-family: 'Manrope', system-ui, sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(232, 80, 58, 0.3);
+    }
+
+    /* ——— Theme Toggle ——— */
+    .theme-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(20px); }
+
+    /* ——— Animation ——— */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate {
+      animation: fadeUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.35s; }
+    .animate-delay-4 { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+
+  <div class="container">
+    <a href="index.html" class="logo animate">remind<span class="logo-dot">.</span></a>
+
+    <div class="error-code animate animate-delay-1">404</div>
+
+    <p class="message animate animate-delay-2">This page doesn't exist.</p>
+
+    <div class="terminal animate animate-delay-3">
+      <div class="terminal-bar">
+        <div class="terminal-dot" style="background: #ff5f57;"></div>
+        <div class="terminal-dot" style="background: #febc2e;"></div>
+        <div class="terminal-dot" style="background: #28c840;"></div>
+      </div>
+      <div class="terminal-body">
+        <div><span class="term-prompt">$</span> <span class="term-cmd">remind search</span> <span class="term-string">"this page"</span></div>
+        <div style="padding-left: 1rem; margin-top: 4px;">
+          <span class="term-error">&#10007;</span> <span class="term-output">No reminders matching</span> <span class="term-string">'this page'</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="index.html" class="btn-primary animate animate-delay-4">
+      Back to home
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <script>
+    // ——— Theme Toggle ———
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

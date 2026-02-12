@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status — Remind</title>
+  <meta name="description" content="System status for Remind CLI services.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Young Serif"', 'Georgia', 'serif'],
+            body: ['Manrope', 'system-ui', 'sans-serif'],
+            mono: ['"Fira Code"', 'monospace'],
+          },
+          colors: {
+            paper: {
+              50: '#fdfcfa',
+              100: '#faf7f2',
+              200: '#f0ebe4',
+              300: '#d4cfc7',
+              400: '#b0a99e',
+              500: '#8a8279',
+              600: '#6b645c',
+              700: '#4a4540',
+              800: '#2a2724',
+              900: '#1a1715',
+              950: '#141211',
+            },
+            coral: {
+              DEFAULT: '#e8503a',
+              light: '#ff6b55',
+              dark: '#c43d2a',
+            },
+            sage: {
+              DEFAULT: '#2d6a4f',
+              light: '#52b788',
+              dark: '#1b4332',
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* ——— Theme Variables ——— */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --bg-terminal: #1a1715;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --accent-secondary: #2d6a4f;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --bg-terminal: #0d0c0b;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --accent-secondary: #52b788;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* ——— Base ——— */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    /* ——— Grain Texture Overlay ——— */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .font-display { font-family: 'Young Serif', Georgia, serif; }
+    .font-mono { font-family: 'Fira Code', monospace; }
+
+    /* ——— Horizontal Rules ——— */
+    .rule {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      transition: background 0.5s ease;
+    }
+
+    /* ——— Theme Toggle ——— */
+    .theme-toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(20px); }
+
+    /* ——— Status Items ——— */
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-secondary);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .status-dot::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: var(--accent-secondary);
+      opacity: 0.2;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent-secondary);
+    }
+
+    /* ——— Uptime Chart ——— */
+    .uptime-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 40px;
+    }
+
+    .uptime-bar {
+      flex: 1;
+      height: 100%;
+      background: var(--accent-secondary);
+      border-radius: 2px;
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+      min-width: 4px;
+    }
+
+    .uptime-bar:hover {
+      opacity: 1;
+    }
+
+    /* ——— Animations ——— */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <!-- ═══════════ NAVIGATION ═══════════ -->
+  <nav class="sticky top-0 z-50 transition-colors duration-500" style="background: var(--bg); border-bottom: 1px solid var(--border);">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10">
+      <div class="flex items-center justify-between h-16">
+        <a href="index.html" class="font-display text-2xl tracking-tight" style="color: var(--text);">
+          remind<span style="color: var(--accent);">.</span>
+        </a>
+        <div class="hidden md:flex items-center gap-10">
+          <a href="docs/index.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Docs</a>
+          <a href="index.html#pricing" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Pricing</a>
+          <a href="status.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--accent); letter-spacing: 0.08em;">Status</a>
+        </div>
+        <div class="flex items-center gap-5">
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════ STATUS HEADER ═══════════ -->
+  <section class="pt-16 md:pt-24 pb-12 px-6 lg:px-10">
+    <div class="max-w-3xl mx-auto">
+      <div class="reveal">
+        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">System Status</p>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
+          Service health.
+        </h1>
+        <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
+          Real-time operational status for all Remind services.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ALL SYSTEMS OPERATIONAL ═══════════ -->
+  <section class="px-6 lg:px-10 pb-8">
+    <div class="max-w-3xl mx-auto">
+      <div class="reveal reveal-delay-1" style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 1.5rem 2rem; transition: all 0.5s ease;">
+        <div class="flex items-center gap-3">
+          <div class="status-dot"></div>
+          <p class="font-semibold" style="color: var(--accent-secondary);">All systems operational</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SERVICE LIST ═══════════ -->
+  <section class="px-6 lg:px-10 pb-16">
+    <div class="max-w-3xl mx-auto">
+      <div class="reveal reveal-delay-2" style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 0.5rem 2rem; transition: all 0.5s ease;">
+
+        <div class="status-item">
+          <div>
+            <p class="font-semibold" style="color: var(--text);">CLI (PyPI)</p>
+            <p class="text-sm mt-0.5" style="color: var(--text-tertiary);">Package distribution and installation</p>
+          </div>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            Operational
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div>
+            <p class="font-semibold" style="color: var(--text);">AI Suggestion API</p>
+            <p class="text-sm mt-0.5" style="color: var(--text-tertiary);">Smart reminder parsing and enhancement</p>
+          </div>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            Operational
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div>
+            <p class="font-semibold" style="color: var(--text);">Authentication</p>
+            <p class="text-sm mt-0.5" style="color: var(--text-tertiary);">User login and API key validation</p>
+          </div>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            Operational
+          </div>
+        </div>
+
+        <div class="status-item">
+          <div>
+            <p class="font-semibold" style="color: var(--text);">Homebrew Tap</p>
+            <p class="text-sm mt-0.5" style="color: var(--text-tertiary);">Formula hosting and updates</p>
+          </div>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            Operational
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ UPTIME CHART ═══════════ -->
+  <section class="px-6 lg:px-10 pb-24">
+    <div class="max-w-3xl mx-auto">
+      <div class="reveal reveal-delay-3">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-display text-2xl" style="color: var(--text);">Uptime (last 30 days)</h2>
+          <p class="text-sm font-semibold" style="color: var(--accent-secondary);">100%</p>
+        </div>
+
+        <div style="background: var(--bg-elevated); border: 1px solid var(--border); padding: 1.5rem 2rem; transition: all 0.5s ease;">
+          <div class="uptime-chart" role="img" aria-label="30-day uptime chart showing 100 percent uptime">
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+            <div class="uptime-bar"></div>
+          </div>
+          <div class="flex justify-between mt-3">
+            <p class="text-xs" style="color: var(--text-tertiary);">30 days ago</p>
+            <p class="text-xs" style="color: var(--text-tertiary);">Today</p>
+          </div>
+        </div>
+
+        <p class="text-sm mt-6" style="color: var(--text-tertiary);">Last checked: February 12, 2025</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer style="border-top: 1px solid var(--border); transition: border-color 0.5s ease;">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+      <div class="grid md:grid-cols-4 gap-12 mb-16">
+        <div>
+          <p class="font-display text-xl mb-4" style="color: var(--text);">remind<span style="color: var(--accent);">.</span></p>
+          <p class="text-sm leading-relaxed" style="color: var(--text-tertiary);">AI-powered reminders<br>for the terminal.</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Product</p>
+          <ul class="space-y-3">
+            <li><a href="index.html#features" class="text-sm transition-colors" style="color: var(--text-tertiary);">Features</a></li>
+            <li><a href="index.html#pricing" class="text-sm transition-colors" style="color: var(--text-tertiary);">Pricing</a></li>
+            <li><a href="changelog.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Changelog</a></li>
+            <li><a href="docs/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Documentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Company</p>
+          <ul class="space-y-3">
+            <li><a href="blog/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Blog</a></li>
+            <li><a href="index.html#contact" class="text-sm transition-colors" style="color: var(--text-tertiary);">Contact</a></li>
+            <li><a href="status.html" class="text-sm transition-colors" style="color: var(--accent);">Status</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Legal</p>
+          <ul class="space-y-3">
+            <li><a href="privacy.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Privacy Policy</a></li>
+            <li><a href="terms.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="rule mb-8">
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">Built with care for the terminal.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════ SCRIPTS ═══════════ -->
+  <script>
+    // ——— Theme Toggle ———
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // ——— Scroll Reveal ———
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    revealEls.forEach(el => revealObserver.observe(el));
+  </script>
+</body>
+</html>

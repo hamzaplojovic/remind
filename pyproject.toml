@@ -1,0 +1,7 @@
+[tool.uv.workspace]
+members = [
+    "apps/cli",
+    "apps/backend",
+    "packages/shared",
+    "packages/database",
+]

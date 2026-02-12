@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "remind-database"
+version = "1.0.0"
+description = "Database layer for Remind - models, repositories, and migrations"
+requires-python = ">=3.12"
+dependencies = [
+    "sqlalchemy",
+    "alembic",
+    "psycopg[binary]",
+    "remind-shared",
+]
+
+[tool.uv.sources]
+remind-shared = { workspace = true }
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+]

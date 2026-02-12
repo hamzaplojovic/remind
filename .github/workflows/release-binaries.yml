@@ -1,0 +1,262 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      matrix:
+        include:
+          - platform: macos
+            arch: x86_64
+            runs-on: macos-13  # Intel x86_64
+            binary-name: remind-macos-x86_64
+
+          - platform: macos
+            arch: arm64
+            runs-on: macos-latest  # Apple Silicon (ARM64)
+            binary-name: remind-macos-arm64
+
+          - platform: linux
+            arch: x86_64
+            runs-on: ubuntu-latest
+            binary-name: remind-linux-x86_64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - name: Install dependencies
+        working-directory: ./apps/cli
+        run: |
+          uv sync --frozen
+
+      - name: Build binary
+        working-directory: ./apps/cli
+        run: |
+          uv run python build_tools/build.py
+
+      - name: Rename binary for release
+        working-directory: ./apps/cli
+        run: |
+          mv dist/remind dist/${{ matrix.binary-name }}
+          chmod +x dist/${{ matrix.binary-name }}
+
+      - name: Generate checksum
+        working-directory: ./apps/cli
+        run: |
+          cd dist
+          shasum -a 256 ${{ matrix.binary-name }} > ${{ matrix.binary-name }}.sha256
+          cat ${{ matrix.binary-name }}.sha256
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary-name }}
+          path: ./apps/cli/dist/${{ matrix.binary-name }}
+          retention-days: 1
+
+      - name: Upload checksum
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums
+          path: ./apps/cli/dist/${{ matrix.binary-name }}.sha256
+          retention-days: 1
+
+  create-release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      release-url: ${{ steps.create_release.outputs.html_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./release-artifacts
+
+      - name: Organize artifacts
+        run: |
+          mkdir -p release-files
+          cp release-artifacts/remind-macos-x86_64/remind-macos-x86_64 release-files/ || true
+          cp release-artifacts/remind-macos-arm64/remind-macos-arm64 release-files/ || true
+          cp release-artifacts/remind-linux-x86_64/remind-linux-x86_64 release-files/ || true
+
+          # Collect checksums
+          cat release-artifacts/checksums/*.sha256 > release-files/SHA256SUMS
+          cat release-files/SHA256SUMS
+
+      - name: Verify all binaries present
+        run: |
+          for binary in remind-macos-x86_64 remind-macos-arm64 remind-linux-x86_64; do
+            if [ ! -f "release-files/$binary" ]; then
+              echo "❌ Missing binary: $binary"
+              exit 1
+            fi
+            chmod +x "release-files/$binary"
+          done
+          echo "✓ All binaries present and executable"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            release-files/remind-macos-x86_64,
+            release-files/remind-macos-arm64,
+            release-files/remind-linux-x86_64,
+            release-files/SHA256SUMS
+          draft: false
+          prerelease: false
+          body: |
+            # Remind ${{ github.ref_name }}
+
+            AI-powered CLI reminder and notification engine
+
+            ## What's New
+            See [CHANGELOG](https://github.com/hamzaplojovic/remind/blob/main/CHANGELOG.md) for details.
+
+            ## Installation
+
+            ### Homebrew
+            ```bash
+            brew tap hamzaplojovic/remind
+            brew install remind-cli
+            ```
+
+            ### Direct Download
+            Download the binary for your platform below, make it executable, and add to PATH:
+            ```bash
+            chmod +x remind-*
+            sudo mv remind-* /usr/local/bin/remind
+            ```
+
+            ### Verify
+            ```bash
+            # Verify SHA256 checksums
+            shasum -c SHA256SUMS
+
+            # Test installation
+            remind --version
+            remind --help
+            ```
+
+            ## Binaries
+
+            - **macOS x86_64 (Intel)**: `remind-macos-x86_64`
+            - **macOS ARM64 (Apple Silicon)**: `remind-macos-arm64`
+            - **Linux x86_64**: `remind-linux-x86_64`
+
+            All binaries are standalone executables with no runtime dependencies.
+
+  update-homebrew-formula:
+    name: Update Homebrew Formula
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - name: Install dependencies
+        working-directory: ./apps/cli
+        run: |
+          uv sync --frozen
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+
+      - name: Generate Homebrew formula
+        working-directory: ./apps/cli
+        run: |
+          uv run python build_tools/generate_homebrew_formula.py hamzaplojovic/remind ${{ steps.get_version.outputs.version }}
+
+      - name: Verify formula syntax
+        run: |
+          FORMULA="apps/cli/build_tools/homebrew_formula.rb"
+
+          # Check key components
+          if ! grep -q "class RemindCli" "$FORMULA"; then
+            echo "❌ Formula missing RemindCli class"
+            exit 1
+          fi
+
+          if ! grep -q "def install" "$FORMULA"; then
+            echo "❌ Formula missing install method"
+            exit 1
+          fi
+
+          if ! grep -q "${{ steps.get_version.outputs.version }}" "$FORMULA"; then
+            echo "❌ Formula missing correct version"
+            exit 1
+          fi
+
+          echo "✓ Formula syntax verified"
+          echo ""
+          echo "Generated formula:"
+          cat "$FORMULA"
+
+      - name: Commit and push formula update
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "noreply@github.com"
+
+          # Check if there are changes
+          if ! git diff --quiet apps/cli/build_tools/homebrew_formula.rb; then
+            git add apps/cli/build_tools/homebrew_formula.rb
+            git commit -m "chore: update homebrew formula for ${{ steps.get_version.outputs.version }}"
+
+            # Push with retry
+            for i in {1..3}; do
+              if git push; then
+                echo "✓ Formula updated and pushed"
+                exit 0
+              fi
+              echo "Retry $i/3..."
+              sleep 5
+            done
+
+            echo "❌ Failed to push formula after 3 retries"
+            exit 1
+          else
+            echo "ℹ No formula changes needed"
+          fi
+
+      - name: Report completion
+        run: |
+          echo "✅ Homebrew formula generation complete"
+          echo ""
+          echo "Summary:"
+          echo "  Version: ${{ steps.get_version.outputs.version }}"
+          echo "  Release: ${{ needs.create-release.outputs.release-url }}"
+          echo "  Status: Formula updated and committed"
+

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Remind</title>
+  <meta name="description" content="Terms of Service for the Remind CLI tool and related services.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* --- Theme Variables --- */
+    :root {
+      --bg: #faf7f2;
+      --bg-elevated: #ffffff;
+      --text: #1a1715;
+      --text-secondary: #6b645c;
+      --text-tertiary: #b0a99e;
+      --accent: #e8503a;
+      --border: #d4cfc7;
+      --border-light: #f0ebe4;
+      --grain-opacity: 0.3;
+    }
+
+    html.dark {
+      --bg: #141211;
+      --bg-elevated: #1a1715;
+      --text: #f0ebe4;
+      --text-secondary: #b0a99e;
+      --text-tertiary: #6b645c;
+      --accent: #ff6b55;
+      --border: #2a2724;
+      --border-light: #1a1715;
+      --grain-opacity: 0.15;
+    }
+
+    /* --- Base --- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Manrope', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      line-height: 1.7;
+    }
+
+    /* --- Grain Texture Overlay --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    ::selection {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    /* --- Theme Toggle --- */
+    .theme-toggle {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--border);
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg);
+      transition: transform 0.3s ease, background 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    html.dark .theme-toggle { background: var(--text-tertiary); }
+    html.dark .theme-toggle::after { transform: translateX(20px); }
+
+    /* --- Legal Document Styles --- */
+    .legal-content h1 {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .legal-content .effective-date {
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      margin-bottom: 3rem;
+    }
+
+    .legal-content h2 {
+      font-family: 'Young Serif', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .legal-content h2:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .legal-content p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .legal-content ul, .legal-content ol {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      padding-left: 1.25rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .legal-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .legal-content strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .legal-content a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      transition: opacity 0.2s ease;
+    }
+
+    .legal-content a:hover {
+      opacity: 0.8;
+    }
+
+    .legal-content code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      background: var(--border-light);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      transition: background 0.5s ease;
+    }
+
+    .plan-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .plan-table th,
+    .plan-table td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+
+    .plan-table th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    .plan-table td {
+      color: var(--text-secondary);
+    }
+
+    .plan-table td:first-child {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* --- Footer --- */
+    footer {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.5s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <nav style="position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--border);transition:background 0.5s ease,border-color 0.5s ease;">
+    <div style="max-width:780px;margin:0 auto;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" style="font-family:'Young Serif',serif;font-size:1.35rem;color:var(--text);text-decoration:none;">remind<span style="color:var(--accent);">.</span></a>
+      <div style="display:flex;align-items:center;gap:1.5rem;">
+        <a href="docs/index.html" style="font-size:0.85rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;">Docs</a>
+        <a href="index.html#pricing" style="font-size:0.85rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-secondary);text-decoration:none;">Pricing</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="legal-content" style="max-width:780px;margin:0 auto;padding:3rem 2rem 4rem;">
+    <h1>Terms of Service</h1>
+    <p class="effective-date">Effective date: January 1, 2025</p>
+
+    <p>These terms govern your use of the Remind CLI tool, API, and related services ("the Service") operated by Remind ("we", "us", "our"). By installing or using Remind, you agree to these terms. If you do not agree, do not use the Service.</p>
+
+    <h2>1. Acceptance</h2>
+    <p>By downloading, installing, or using the Remind CLI or accessing our API, you confirm that you are at least 16 years of age and that you accept these terms in full. If you are using the Service on behalf of an organization, you represent that you have the authority to bind that organization to these terms.</p>
+
+    <h2>2. The Service</h2>
+    <p>Remind is a command-line tool for creating, managing, and receiving reminders. The Service includes:</p>
+    <ul>
+      <li>The Remind CLI application installed on your device.</li>
+      <li>A backend API that handles license validation, AI processing, and plan management.</li>
+      <li>Optional AI-powered features for natural language parsing, smart scheduling, and priority suggestions.</li>
+      <li>A background notification scheduler that runs on your device.</li>
+    </ul>
+    <p>The core CLI functions (creating, listing, completing, and deleting reminders) work entirely offline using a local SQLite database. AI features and license validation require an internet connection.</p>
+
+    <h2>3. Accounts &amp; Tokens</h2>
+    <p>To use paid features, you must create an account by providing a valid email address. Upon signup, you receive a license token that authenticates your CLI installation against our API.</p>
+    <ul>
+      <li>You are responsible for keeping your license token secure. Do not share it or commit it to version control.</li>
+      <li>One license token corresponds to one user. Sharing tokens across users violates these terms.</li>
+      <li>If you believe your token has been compromised, regenerate it immediately via <code>remind auth refresh</code> or contact support.</li>
+    </ul>
+
+    <h2>4. Acceptable Use</h2>
+    <p>You agree not to:</p>
+    <ul>
+      <li>Use the Service for any unlawful purpose or in violation of any applicable laws.</li>
+      <li>Attempt to reverse-engineer, decompile, or extract the source code of our backend API.</li>
+      <li>Circumvent rate limits, plan quotas, or license restrictions through any technical means.</li>
+      <li>Use automated scripts to create accounts or generate excessive API requests.</li>
+      <li>Submit content through AI features that is abusive, harmful, or designed to exploit the AI system.</li>
+      <li>Resell, sublicense, or redistribute the Service without written permission.</li>
+    </ul>
+
+    <h2>5. AI Features</h2>
+    <p>Remind offers optional AI-powered features. When enabled:</p>
+    <ul>
+      <li>The text of your reminder is sent to our API and forwarded to a third-party AI provider for processing.</li>
+      <li>AI responses (suggested timing, priority, refined text) are generated in real time and not permanently stored.</li>
+      <li>AI output is provided as suggestions. You are responsible for reviewing and accepting them.</li>
+      <li>We do not guarantee the accuracy, appropriateness, or reliability of AI-generated suggestions.</li>
+      <li>AI features can be disabled at any time by running <code>remind config set ai.enabled false</code>.</li>
+    </ul>
+    <p>See our <a href="privacy.html">Privacy Policy</a> for details on how AI data is processed and protected.</p>
+
+    <h2>6. Payment &amp; Plans</h2>
+    <p>Remind offers the following plans:</p>
+
+    <table class="plan-table">
+      <thead>
+        <tr>
+          <th>Plan</th>
+          <th>Price</th>
+          <th>AI Suggestions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Free</td>
+          <td>$0</td>
+          <td>5 / month</td>
+        </tr>
+        <tr>
+          <td>Indie</td>
+          <td>$5 / month</td>
+          <td>100 / month</td>
+        </tr>
+        <tr>
+          <td>Pro</td>
+          <td>$15 / month</td>
+          <td>1,000 / month</td>
+        </tr>
+        <tr>
+          <td>Team</td>
+          <td>$50 / month</td>
+          <td>5,000+ / month</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ul>
+      <li>All paid plans include a 7-day free trial. You will not be charged during the trial period.</li>
+      <li>Payments are processed by Stripe. By subscribing, you also agree to <a href="https://stripe.com/legal">Stripe's terms</a>.</li>
+      <li>Plans renew automatically. You can cancel at any time via <code>remind billing cancel</code> or your account dashboard.</li>
+      <li>Refunds are available within 14 days of the most recent charge if you are unsatisfied. Contact <a href="mailto:billing@remind.dev">billing@remind.dev</a>.</li>
+      <li>We reserve the right to change pricing with 30 days notice. Existing subscribers retain their current rate until the end of their billing cycle.</li>
+      <li>Annual plans are available at a 20% discount. Annual payments are non-refundable after the first 14 days.</li>
+    </ul>
+
+    <h2>7. Intellectual Property</h2>
+    <p>The Remind CLI source code is licensed under the terms specified in its repository. The Remind name, logo, website design, API, and backend infrastructure are proprietary and owned by Remind.</p>
+    <ul>
+      <li>Your reminder data belongs to you. We claim no ownership over content you create with the Service.</li>
+      <li>You grant us a limited, non-exclusive license to process your reminder text solely for the purpose of providing AI features, and only when those features are enabled.</li>
+      <li>Feedback, suggestions, or feature requests you submit may be used to improve the Service without obligation or compensation.</li>
+    </ul>
+
+    <h2>8. Limitation of Liability</h2>
+    <p>The Service is provided "as is" and "as available" without warranties of any kind, express or implied.</p>
+    <ul>
+      <li>We do not guarantee that the Service will be uninterrupted, error-free, or available at all times.</li>
+      <li>We are not liable for missed reminders, incorrect AI suggestions, or any consequences arising from reliance on the Service.</li>
+      <li>Our total liability to you for any claim arising from these terms or the Service is limited to the amount you paid us in the 12 months preceding the claim, or $50, whichever is greater.</li>
+      <li>We are not liable for indirect, incidental, consequential, or punitive damages of any kind.</li>
+    </ul>
+
+    <h2>9. Termination</h2>
+    <ul>
+      <li>You may stop using the Service at any time by uninstalling the CLI and canceling your subscription.</li>
+      <li>We may suspend or terminate your access if you violate these terms, with notice when practical.</li>
+      <li>Upon termination, your license token is revoked. Your local reminder data remains on your device and is unaffected.</li>
+      <li>Sections that should survive termination (liability, intellectual property, governing law) will survive.</li>
+    </ul>
+
+    <h2>10. Governing Law</h2>
+    <p>These terms are governed by and construed in accordance with the laws of the State of Delaware, United States, without regard to conflict of law principles. Any disputes arising from these terms or the Service will be resolved in the state or federal courts located in Delaware.</p>
+
+    <h2>11. Changes to These Terms</h2>
+    <p>We may update these terms from time to time. When we make material changes, we will:</p>
+    <ul>
+      <li>Update the effective date at the top of this page.</li>
+      <li>Display a notice in the CLI on your next run.</li>
+      <li>Send an email notification to account holders for significant changes.</li>
+    </ul>
+    <p>Continued use of the Service after changes take effect constitutes acceptance of the revised terms. If you disagree with any changes, stop using the Service and cancel your subscription.</p>
+
+    <h2>12. Contact</h2>
+    <p>If you have questions about these terms:</p>
+    <ul>
+      <li>Email: <a href="mailto:legal@remind.dev">legal@remind.dev</a></li>
+      <li>GitHub: <a href="https://github.com/remind-cli/remind">remind-cli/remind</a></li>
+      <li>Twitter: <a href="https://twitter.com/RemindCLI">@RemindCLI</a></li>
+    </ul>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="max-width:780px;margin:0 auto;padding:2rem;text-align:center;">
+      <p style="font-size:0.85rem;color:var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Theme Toggle
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+  </script>
+</body>
+</html>

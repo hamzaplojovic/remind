@@ -1,0 +1,130 @@
+name: Sync Homebrew Tap
+
+on:
+  workflow_run:
+    workflows: ["Release Binaries"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sync-tap:
+    name: Sync to Homebrew Tap
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest release version
+        id: get_version
+        run: |
+          # Get the tag that triggered the release workflow
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No tags found"
+            exit 1
+          fi
+          echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Release version: $LATEST_TAG"
+
+      - name: Check Homebrew tap repository exists
+        id: check_repo
+        run: |
+          REPO_URL="https://github.com/hamzaplojovic/homebrew-remind"
+          if curl -s -I "$REPO_URL" | head -1 | grep -q "200"; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✓ Tap repository exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "ℹ Tap repository does not exist (will need manual creation)"
+          fi
+
+      - name: Checkout Homebrew tap (if exists)
+        if: steps.check_repo.outputs.exists == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: hamzaplojovic/homebrew-remind
+          path: homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN || github.token }}
+
+      - name: Update formula in tap
+        if: steps.check_repo.outputs.exists == 'true'
+        run: |
+          mkdir -p homebrew-tap/Formula
+          cp apps/cli/build_tools/homebrew_formula.rb homebrew-tap/Formula/remind-cli.rb
+
+          # Verify the file was copied
+          if [ ! -f "homebrew-tap/Formula/remind-cli.rb" ]; then
+            echo "❌ Failed to copy formula"
+            exit 1
+          fi
+          echo "✓ Formula copied to tap"
+
+      - name: Commit and push formula to tap
+        if: steps.check_repo.outputs.exists == 'true'
+        run: |
+          cd homebrew-tap
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          # Check if there are changes
+          if git diff --quiet Formula/remind-cli.rb; then
+            echo "No changes to formula"
+            exit 0
+          fi
+
+          git add Formula/remind-cli.rb
+          git commit -m "chore: update remind-cli formula for ${{ steps.get_version.outputs.version }}"
+
+          # Push with retry
+          for i in {1..3}; do
+            if git push origin main; then
+              echo "✓ Formula pushed to tap"
+              exit 0
+            fi
+            echo "Retry $i/3..."
+            sleep 5
+          done
+
+          echo "❌ Failed to push to tap after 3 retries"
+          exit 1
+
+      - name: Report tap sync status
+        if: always()
+        run: |
+          if [ "${{ steps.check_repo.outputs.exists }}" = "true" ]; then
+            echo "✅ Homebrew tap synced successfully"
+            echo ""
+            echo "Users can now install with:"
+            echo "  brew tap hamzaplojovic/remind"
+            echo "  brew install remind-cli"
+          else
+            echo "⚠️  Homebrew tap not found at:"
+            echo "    https://github.com/hamzaplojovic/homebrew-remind"
+            echo ""
+            echo "Create the tap manually and enable HOMEBREW_TAP_TOKEN secret to auto-sync"
+            echo ""
+            echo "To create the tap:"
+            echo "  1. Create repo: https://github.com/new?name=homebrew-remind"
+            echo "  2. Clone it locally"
+            echo "  3. mkdir -p Formula"
+            echo "  4. cp apps/cli/build_tools/homebrew_formula.rb Formula/remind-cli.rb"
+            echo "  5. git add Formula/ && git commit -m 'Initial formula'"
+            echo "  6. git push origin main"
+            echo "  7. Add HOMEBREW_TAP_TOKEN secret to main repo"
+          fi
+
+      - name: Create tap if it doesn't exist (optional automation)
+        if: steps.check_repo.outputs.exists == 'false'
+        run: |
+          echo "Note: To fully automate tap creation, you would need:"
+          echo "  1. GitHub Personal Access Token with 'repo' scope"
+          echo "  2. Add as GITHUB_TOKEN_ADMIN secret"
+          echo ""
+          echo "Then this workflow can auto-create the tap on first release."
+          echo "For now, create manually: https://github.com/new?name=homebrew-remind"

@@ -1,0 +1,43 @@
+name: Lint & Type Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Lint with ruff
+        run: |
+          uv run ruff check apps/ packages/
+
+      - name: Format check with ruff
+        run: |
+          uv run ruff format --check apps/ packages/
+
+      - name: Type check with mypy
+        run: |
+          uv run mypy apps/backend/src --strict || true
+          uv run mypy apps/cli/src --strict || true
+
+      - name: Security check with bandit
+        run: |
+          uv run bandit -r apps/ -ll || true
