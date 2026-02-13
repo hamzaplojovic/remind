@@ -41,6 +41,7 @@ class AIResponse(BaseModel):
     priority: PriorityLevel
     due_time_suggestion: str | None = None
     cost_estimate: float | None = None
+    quota_exhausted: bool = False
 
 
 class License(BaseModel):

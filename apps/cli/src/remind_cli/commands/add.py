@@ -29,14 +29,17 @@ def add(
     try:
         from dateparser import parse as dateparser_parse
 
-        # Parse due date
+        user_set_due = due is not None
+        user_set_priority = priority != "medium"
+
+        # Parse explicit --due flag
         if due:
             due_dt = dateparser_parse(due)
             if not due_dt:
                 output.error(f"Could not parse due date: {due}")
                 raise typer.Exit(1)
         else:
-            due_dt = datetime.now()
+            due_dt = None
 
         # Validate priority
         try:
@@ -55,10 +58,33 @@ def add(
         try:
             with output.spinner("Getting AI suggestion"):
                 ai_response = ai_service.suggest_reminder(text)
-            ai_text = ai_response.suggested_text
-            output.ai_suggestion(ai_text)
+
+            if ai_response.quota_exhausted:
+                output.warning("AI quota exhausted — saving reminder without AI")
+            else:
+                ai_text = ai_response.suggested_text
+                output.ai_suggestion(ai_text)
+
+                # Use AI's due time if user didn't explicitly set --due
+                if not user_set_due and ai_response.due_time_suggestion:
+                    parsed = dateparser_parse(ai_response.due_time_suggestion)
+                    if parsed:
+                        due_dt = parsed
+
+                # Use AI's priority if user didn't explicitly set --priority
+                if not user_set_priority and ai_response.priority:
+                    priority_level = ai_response.priority
+
         except Exception as e:
             output.warning(f"AI suggestion failed: {e}")
+
+        # Fall back: try to parse date from the text itself
+        if due_dt is None:
+            parsed = dateparser_parse(text, settings={"PREFER_DATES_FROM": "future"})
+            if parsed and parsed > datetime.now():
+                due_dt = parsed
+            else:
+                due_dt = datetime.now()
 
         # Create reminder with context manager
         with db_session.get_session() as session:
