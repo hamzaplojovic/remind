@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Claude Code Integration — Remind CLI</title>
-  <meta name="description" content="Remind is the first CLI tool with native Claude Code support via MCP. 7 tools, agent reminders, and autonomous task scheduling — right inside your coding session.">
+  <meta name="description" content="Remind is the first CLI tool with native Claude Code support via MCP. 15 tools, agent reminders, and autonomous task scheduling — right inside your coding session.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='24' r='6' fill='%23e8503a'/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,7 +61,7 @@
       --accent-secondary: #2d6a4f;
       --border: #d4cfc7;
       --border-light: #f0ebe4;
-      --grain-opacity: 0.3;
+      --grain-opacity: 0.12;
     }
 
     html.dark {
@@ -75,7 +75,7 @@
       --accent-secondary: #52b788;
       --border: #2a2724;
       --border-light: #1a1715;
-      --grain-opacity: 0.15;
+      --grain-opacity: 0.08;
     }
 
     /* --- Base --- */
@@ -98,9 +98,9 @@
       z-index: 9999;
       pointer-events: none;
       opacity: var(--grain-opacity);
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 128px 128px;
+      background-size: 182px 182px;
     }
 
     ::selection {
@@ -417,7 +417,7 @@
             Your AI assistant<br>remembers for you.
           </h1>
           <p class="text-lg md:text-xl leading-relaxed mb-10 max-w-lg reveal reveal-delay-2" style="color: var(--text-secondary);">
-            Remind is the first CLI tool with native Claude Code support. 7 MCP tools, agent reminders, and autonomous task scheduling — right inside your coding session.
+            Remind is the first CLI tool with native Claude Code support. 15 MCP tools, agent reminders, and autonomous task scheduling — right inside your coding session.
           </p>
           <div class="flex flex-wrap gap-4 mb-10 reveal reveal-delay-3">
             <a href="#setup" class="btn-primary">
@@ -449,12 +449,12 @@
               <div>&nbsp;</div>
               <div style="border-top: 1px solid #2a2724; margin: 8px 0;"></div>
               <div>&nbsp;</div>
-              <div><span class="term-flag">You:</span> <span class="term-string">"What reminders do I have this week?"</span></div>
+              <div><span class="term-flag">You:</span> <span class="term-string">"Give me a summary of what's pending"</span></div>
               <div>&nbsp;</div>
-              <div><span class="term-flag">Claude:</span> <span class="term-output">You have 3 reminders:</span></div>
-              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#12 [HIGH] Fix auth bug — due: Wed 9am</span></div>
-              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#14 [MED] Review PR #89 — due: Thu 2pm</span></div>
-              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#15 [MED] Deploy v2 — due: Fri 3pm</span></div>
+              <div><span class="term-flag">Claude:</span> <span class="term-output">Here's your summary:</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output" style="color: #ff6b55;">Overdue: 1</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output" style="color: #f0c674;">Due today: 2</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Active total: 5</span></div>
             </div>
           </div>
         </div>
@@ -511,7 +511,7 @@
             <div class="font-display text-4xl flex-shrink-0" style="color: var(--accent); width: 2.5rem; text-align: right; line-height: 1;">3</div>
             <div style="flex: 1;">
               <h3 class="font-display text-xl mb-2" style="color: var(--text);">Talk to Claude</h3>
-              <p class="text-sm" style="color: var(--text-secondary); line-height: 1.7;">That's it. Claude now has access to all 7 tools. Just ask naturally — <span style="color: var(--text);">"Remind me to deploy on Friday"</span> — and it picks the right tool.</p>
+              <p class="text-sm" style="color: var(--text-secondary); line-height: 1.7;">That's it. Claude now has access to all 15 tools. Just ask naturally — <span style="color: var(--text);">"Remind me to deploy on Friday"</span> — and it picks the right tool.</p>
             </div>
           </div>
         </div>
@@ -544,13 +544,13 @@
 
   <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
 
-  <!-- 7 MCP TOOLS -->
+  <!-- 15 MCP TOOLS -->
   <section id="tools" class="py-24 md:py-32 px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
       <div class="max-w-2xl mb-16 reveal">
         <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">MCP Tools</p>
         <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
-          7 tools. Zero config.
+          15 tools. Zero config.
         </h2>
         <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
           Every tool is available the moment you connect. Just talk to Claude naturally — it picks the right tool automatically.
@@ -633,6 +633,110 @@
           </p>
           <p class="text-xs font-mono" style="color: var(--text-tertiary);">
             "Delete reminder #5"
+          </p>
+        </div>
+
+        <!-- get_context -->
+        <div class="tool-card reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">get_context</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Get reminders filtered by your current project (auto-detected from working directory).
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "Show me reminders for this project"
+          </p>
+        </div>
+
+        <!-- get_overdue -->
+        <div class="tool-card reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">get_overdue</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Surface all overdue reminders that need attention right now.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "What's overdue?"
+          </p>
+        </div>
+
+        <!-- get_upcoming -->
+        <div class="tool-card reveal reveal-delay-3">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">get_upcoming</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            See reminders due within the next N hours. Defaults to 24.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "What's coming up in the next 6 hours?"
+          </p>
+        </div>
+
+        <!-- snooze_reminder -->
+        <div class="tool-card reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">snooze_reminder</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Push a reminder back by a relative duration — minutes, hours, or days.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "Snooze #12 by 2 hours"
+          </p>
+        </div>
+
+        <!-- bulk_complete -->
+        <div class="tool-card reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">bulk_complete</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Complete multiple reminders at once with comma-separated IDs.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "Mark #3, #5, and #7 as done"
+          </p>
+        </div>
+
+        <!-- get_summary -->
+        <div class="tool-card reveal reveal-delay-3">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">get_summary</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Get a structured dashboard: overdue count, due today, by priority, by project.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "Give me a summary"
+          </p>
+        </div>
+
+        <!-- get_config -->
+        <div class="tool-card reveal reveal-delay-1">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">get_config</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Read your Remind configuration settings.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "What's my current timezone?"
+          </p>
+        </div>
+
+        <!-- set_config -->
+        <div class="tool-card reveal reveal-delay-2">
+          <div class="flex items-center gap-3 mb-3">
+            <code class="font-mono text-sm font-semibold" style="color: var(--accent);">set_config</code>
+          </div>
+          <p class="text-sm mb-4" style="color: var(--text-secondary); line-height: 1.6;">
+            Change configuration settings like timezone or notification preferences.
+          </p>
+          <p class="text-xs font-mono" style="color: var(--text-tertiary);">
+            "Set my timezone to US/Pacific"
           </p>
         </div>
 
@@ -917,62 +1021,6 @@
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-comment">full permissions at the scheduled time.</span></div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
-
-  <!-- PRICING CALLOUT -->
-  <section class="py-24 md:py-32 px-6 lg:px-10">
-    <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-16 reveal">
-        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Pricing</p>
-        <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
-          All MCP tools included free.
-        </h2>
-        <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
-          Every MCP tool works on the free plan. Upgrade for more AI suggestions and higher quotas.
-        </p>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-6 max-w-2xl">
-        <div class="pricing-card reveal reveal-delay-1">
-          <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--text-tertiary); letter-spacing: 0.1em;">Free</p>
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">$0</div>
-          <p class="text-sm mb-6" style="color: var(--text-tertiary);">forever</p>
-          <hr class="rule-dotted mb-6">
-          <ul class="space-y-3 mb-8" style="color: var(--text-secondary); font-size: 0.9rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> All 7 MCP tools</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5 AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
-          </ul>
-          <a href="index.html#install" class="btn-secondary w-full justify-center text-sm">Get Started</a>
-        </div>
-
-        <div class="pricing-card featured reveal reveal-delay-2">
-          <div class="flex items-center justify-between mb-4">
-            <p class="text-sm font-semibold tracking-widest uppercase" style="color: var(--accent); letter-spacing: 0.1em;">Indie</p>
-            <span class="text-xs font-bold tracking-widest uppercase px-3 py-1" style="background: var(--accent); color: white; letter-spacing: 0.1em;">Popular</span>
-          </div>
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">$5<span class="text-lg" style="color: var(--text-tertiary);">/mo</span></div>
-          <p class="text-sm mb-6" style="color: var(--text-tertiary);">or $48/year (save 20%)</p>
-          <hr class="rule-dotted mb-6">
-          <ul class="space-y-3 mb-8" style="color: var(--text-secondary); font-size: 0.9rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> All 7 MCP tools</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 100 AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority notifications</li>
-          </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/indie" class="btn-primary w-full justify-center text-sm">Start Free Trial</a>
-        </div>
-      </div>
-
-      <div class="mt-8 reveal">
-        <a href="index.html#pricing" class="text-sm font-medium transition-colors" style="color: var(--accent);">
-          See all plans &rarr;
-        </a>
       </div>
     </div>
   </section>

@@ -44,7 +44,7 @@
       --accent-secondary: #2d6a4f;
       --border: #d4cfc7;
       --border-light: #f0ebe4;
-      --grain-opacity: 0.3;
+      --grain-opacity: 0.12;
     }
 
     html.dark {
@@ -58,7 +58,7 @@
       --accent-secondary: #52b788;
       --border: #2a2724;
       --border-light: #1a1715;
-      --grain-opacity: 0.15;
+      --grain-opacity: 0.08;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
@@ -79,9 +79,9 @@
       z-index: 9999;
       pointer-events: none;
       opacity: var(--grain-opacity);
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
       background-repeat: repeat;
-      background-size: 128px 128px;
+      background-size: 182px 182px;
     }
 
     ::selection { background-color: var(--accent); color: white; }
@@ -280,20 +280,20 @@
       <!-- Main hero content — stacked, centered -->
       <div class="text-center max-w-4xl mx-auto mb-16 md:mb-20">
         <div class="reveal" style="margin-bottom: 2rem;">
-          <span class="inline-block text-xs font-bold tracking-widest uppercase px-4 py-2" style="color: var(--accent); letter-spacing: 0.2em; border: 1px solid var(--accent); opacity: 0.9;">First CLI with native Claude Code integration</span>
+          <span class="inline-block text-xs font-bold tracking-widest uppercase px-4 py-2" style="color: var(--accent); letter-spacing: 0.2em; border: 1px solid var(--accent); opacity: 0.9;">15 MCP Tools &middot; The #1 Claude Code Integration</span>
         </div>
 
         <h1 class="font-display leading-[1.0] mb-8 reveal reveal-delay-1" style="color: var(--text); font-size: clamp(3rem, 8vw, 6.5rem);">
-          Your AI works<br>
+          What if your AI<br>
           <span style="color: var(--accent); position: relative; display: inline-block;">
-            while you sleep.
+            never forgot?
             <svg style="position: absolute; bottom: -4px; left: 0; width: 100%; height: 8px; overflow: visible;" viewBox="0 0 400 8" preserveAspectRatio="none"><path d="M0 5 Q100 0 200 5 Q300 10 400 5" stroke="var(--accent)" stroke-width="2.5" fill="none" opacity="0.5"/></svg>
           </span>
         </h1>
 
         <p class="text-xl md:text-2xl leading-relaxed mb-12 max-w-2xl mx-auto reveal reveal-delay-2" style="color: var(--text-secondary); font-weight: 300;">
-          Schedule Claude Code to run tests at 3am. Create reminders mid-conversation. Get nudged until it's done.
-          <strong style="color: var(--text); font-weight: 600;">All from your terminal.</strong>
+          Remind gives Claude Code 15 tools to manage your work. Create reminders by talking. Get project dashboards. Snooze, bulk-complete, track overdue — schedule overnight builds.
+          <strong style="color: var(--text); font-weight: 600;">Free forever. 30-second install.</strong>
         </p>
 
         <div class="reveal reveal-delay-3" id="install">
@@ -369,7 +369,7 @@
       </a>
       <span style="color: var(--border);">|</span>
       <span class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="color: var(--text-tertiary); letter-spacing: 0.08em;">
-        7 MCP Tools
+        15 MCP Tools
       </span>
       <span style="color: var(--border);">|</span>
       <span class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="color: var(--text-tertiary); letter-spacing: 0.08em;">
@@ -436,11 +436,15 @@
           <div class="space-y-4 mb-8">
             <div class="flex gap-3 items-start">
               <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
-              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">7 MCP tools</strong> — add, list, complete, search, update, delete, and schedule agent tasks</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">15 MCP tools</strong> — add, list, search, snooze, bulk-complete, project dashboards, overdue tracking, and more</span>
             </div>
             <div class="flex gap-3 items-start">
               <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
-              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">Agent reminders</strong> — schedule Claude to run tasks autonomously at a future time</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">Agent reminders</strong> — schedule Claude to run tasks autonomously while you sleep</span>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">Get a summary in one sentence</strong> — "What's overdue?" and Claude gives you the full picture</span>
             </div>
             <div class="flex gap-3 items-start">
               <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
@@ -617,17 +621,17 @@
   <!-- PRICING -->
   <section id="pricing" class="py-24 md:py-32 px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-16 reveal">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
         <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Pricing</p>
         <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
           Free to start.<br>Cheap to scale.
         </h2>
         <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
-          The CLI is free forever with unlimited reminders. AI features and Claude Code tools work on every plan. Upgrade when you need more AI suggestions.
+          All 15 MCP tools, agent reminders, and notifications included on every plan. Upgrade for more AI suggestions.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6 mx-auto" style="align-items: stretch;">
+      <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-6">
         <!-- Free -->
         <div class="pricing-card reveal reveal-delay-1" style="display: flex; flex-direction: column;">
           <p class="text-sm font-semibold tracking-widest uppercase mb-6" style="color: var(--text-tertiary); letter-spacing: 0.1em;">Free</p>
@@ -636,12 +640,12 @@
           <hr class="rule-dotted mb-8">
           <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> All 7 MCP tools</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> All 15 MCP tools</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5 AI suggestions / month</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Notifications + nudges</li>
           </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/free" class="btn-secondary w-full justify-center" style="margin-top: auto;">Get Started</a>
+          <a href="#install" class="btn-secondary w-full justify-center" style="margin-top: auto;">Get Started</a>
         </div>
 
         <!-- Indie -->
@@ -656,7 +660,6 @@
           <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Everything in Free</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> <strong style="color: var(--text);">100</strong> AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority notifications</li>
           </ul>
           <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/indie" class="btn-primary w-full justify-center" style="margin-top: auto;">Start Free Trial</a>
         </div>
@@ -670,14 +673,13 @@
           <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Everything in Indie</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> <strong style="color: var(--text);">1,000</strong> AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority support</li>
           </ul>
           <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/pro" class="btn-secondary w-full justify-center" style="margin-top: auto;">Get Pro</a>
         </div>
       </div>
 
-      <p class="text-sm mt-8 reveal" style="color: var(--text-tertiary);">
-        Need more? <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/team" style="color: var(--accent); text-decoration: underline;">Team plan</a> starts at $50/mo with 5,000+ AI suggestions.
+      <p class="text-sm text-center mt-8 reveal" style="color: var(--text-tertiary);">
+        Need more? <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/team" style="color: var(--accent); text-decoration: underline; text-underline-offset: 3px;">Team plan</a> starts at $50/mo with 5,000+ AI suggestions.
       </p>
     </div>
   </section>
@@ -830,19 +832,20 @@
           ]
         },
         {
-          command: 'What reminders do I have?',
+          command: "Give me a summary of what's pending",
           output: [
-            { html: '<span class="term-flag">Claude:</span> <span class="term-output">You have 3 reminders:</span>', delay: 300 },
-            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#12 [HIGH] Fix auth bug — Wed 9am</span>', delay: 150 },
-            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#14 [MED] Review PR #89 — Thu 2pm</span>', delay: 150 },
-            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#15 [MED] Deploy v2 — Fri 3pm</span>', delay: 150 },
+            { html: '<span class="term-flag">Claude:</span> <span class="term-output">Reminder Summary:</span>', delay: 300 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Total active: 5</span>', delay: 120 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#e8503a;">Overdue: 1</span> <span class="term-output">| Due today: 2</span>', delay: 120 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">By priority: HIGH 2, MED 2, LOW 1</span>', delay: 120 },
           ]
         },
         {
-          command: 'Mark #12 as done',
+          command: 'Snooze #12 by 2 hours, complete #14 and #15',
           output: [
-            { html: '<span class="term-flag">Claude:</span> <span style="color:#52b788;">&#10003;</span> <span class="term-output">Completed:</span> <span style="color: #f0c674; text-decoration: line-through;">Fix auth bug</span>', delay: 400 },
-            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">2 reminders remaining.</span>', delay: 200 },
+            { html: '<span class="term-flag">Claude:</span> <span style="color:#52b788;">&#10003;</span> <span class="term-output">Snoozed #12 until 4:30 PM</span>', delay: 400 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#52b788;">&#10003;</span> <span class="term-output">Completed: <span style="text-decoration: line-through; color: #f0c674;">Review PR #89</span></span>', delay: 200 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#52b788;">&#10003;</span> <span class="term-output">Completed: <span style="text-decoration: line-through; color: #f0c674;">Deploy v2</span></span>', delay: 200 },
           ]
         }
       ];
