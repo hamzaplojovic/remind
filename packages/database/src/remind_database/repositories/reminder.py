@@ -60,7 +60,7 @@ class ReminderRepository:
         """Mark a reminder as done."""
         reminder = self.session.query(ReminderModel).filter_by(id=reminder_id).first()
         if reminder:
-            reminder.done_at = datetime.now(timezone.utc)
+            reminder.done_at = datetime.now()
             self.session.commit()
             self.session.refresh(reminder)
             return reminder.to_pydantic()
@@ -88,7 +88,7 @@ class ReminderRepository:
 
     def get_overdue(self) -> list[Reminder]:
         """Get all overdue reminders (due_at < now and not done)."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         reminders = (
             self.session.query(ReminderModel)
             .filter(ReminderModel.due_at < now)
@@ -100,7 +100,7 @@ class ReminderRepository:
 
     def get_upcoming(self, hours: int = 24) -> list[Reminder]:
         """Get reminders due within the next N hours."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         from datetime import timedelta
 
         future = now + timedelta(hours=hours)

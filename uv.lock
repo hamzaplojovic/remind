@@ -1131,7 +1131,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "remind-cli"
-version = "1.0.10"
+version = "1.0.11"
 source = { editable = "apps/cli" }
 dependencies = [
     { name = "dateparser" },
@@ -1187,7 +1187,7 @@ provides-extras = ["linux", "macos", "dev", "build"]
 
 [[package]]
 name = "remind-database"
-version = "1.0.0"
+version = "1.0.1"
 source = { editable = "packages/database" }
 dependencies = [
     { name = "alembic" },

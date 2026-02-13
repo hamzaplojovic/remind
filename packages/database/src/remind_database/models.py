@@ -55,9 +55,9 @@ class ReminderModel(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     text = Column(String(1000), nullable=False)
-    due_at = Column(DateTime(timezone=True), nullable=False)
-    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
-    done_at = Column(DateTime(timezone=True), nullable=True)
+    due_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    done_at = Column(DateTime, nullable=True)
     priority = Column(String(20), nullable=False, default="medium")
     project_context = Column(String(500), nullable=True)
     ai_suggested_text = Column(Text, nullable=True)
