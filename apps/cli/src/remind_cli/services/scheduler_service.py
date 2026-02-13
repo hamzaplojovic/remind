@@ -21,8 +21,9 @@ class SchedulerRunner:
         self.db_session = DatabaseSession(db_config)
         self.notifications = NotificationManager(strict=False)
         self.running = False
-        self.check_interval_minutes = 5
+        self.check_interval_seconds = 1
         self.nudge_intervals_minutes = [30, 60, 120]  # 30min, 1hr, 2hr
+        self.notified_ids: set[int] = set()  # reminders already notified
         self.last_nudge_times: dict[int, datetime] = {}
 
     def start(self) -> None:
@@ -33,12 +34,12 @@ class SchedulerRunner:
         signal.signal(signal.SIGINT, self._handle_shutdown)
         signal.signal(signal.SIGTERM, self._handle_shutdown)
 
-        output.info(f"Scheduler started. Checking every {self.check_interval_minutes} minutes")
+        output.info(f"Scheduler started. Checking every {self.check_interval_seconds}s")
 
         try:
             while self.running:
                 self._check_and_notify()
-                time.sleep(self.check_interval_minutes * 60)
+                time.sleep(self.check_interval_seconds)
         except KeyboardInterrupt:
             self._shutdown()
 
@@ -64,10 +65,12 @@ class SchedulerRunner:
             with self.db_session.get_session() as session:
                 reminder_service = ReminderService(session)
 
-                # Get overdue reminders
+                # Get overdue reminders (only notify once per reminder)
                 overdue = reminder_service.get_overdue_reminders()
                 for reminder in overdue:
-                    self._send_notification(reminder)
+                    if reminder.id not in self.notified_ids:
+                        self._send_notification(reminder)
+                        self.notified_ids.add(reminder.id)
 
                 # Get upcoming reminders (due within 24 hours but not yet due)
                 upcoming = reminder_service.get_upcoming_reminders()
