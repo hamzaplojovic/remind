@@ -44,7 +44,7 @@ class Settings(BaseSettings):
 
     # Email (Resend)
     resend_api_key: str = os.getenv("RESEND_API_KEY", "")
-    email_from: str = os.getenv("EMAIL_FROM", "onboarding@resend.dev")
+    email_from: str = os.getenv("EMAIL_FROM", "remind@hamzaplojovic.blog")
 
     # Rate limiting
     rate_limit_requests: int = int(os.getenv("RATE_LIMIT_REQUESTS", "10"))
