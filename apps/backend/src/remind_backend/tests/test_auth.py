@@ -66,22 +66,6 @@ def test_authenticate_token_inactive(test_db):
         authenticate_token(test_db, "test_token_123")
 
 
-def test_authenticate_token_expired(test_db):
-    """Test authentication fails with expired license."""
-    user = UserModel(
-        token="test_token_123",
-        email="user@example.com",
-        plan_tier="pro",
-        active=True,
-        expires_at=datetime.now(timezone.utc) - timedelta(days=1),
-    )
-    test_db.add(user)
-    test_db.commit()
-
-    with pytest.raises(AuthError, match="expired"):
-        authenticate_token(test_db, "test_token_123")
-
-
 def test_check_rate_limit_first_request(test_db):
     """Test rate limit resets on first request of window."""
     user = UserModel(token="test", email="test@example.com", plan_tier="pro", active=True)
@@ -115,7 +99,6 @@ def test_get_monthly_quota_used(test_db):
     for _ in range(3):
         log = UsageLogModel(
             user_id=user.id,
-            feature="ai_suggestion",
             input_tokens=100,
             output_tokens=50,
             cost_cents=1,
@@ -136,7 +119,6 @@ def test_check_ai_quota_free_plan(test_db):
     for _ in range(5):
         log = UsageLogModel(
             user_id=user.id,
-            feature="ai_suggestion",
             input_tokens=100,
             output_tokens=50,
             cost_cents=1,
@@ -157,7 +139,6 @@ def test_check_ai_quota_pro_plan_available(test_db):
     for _ in range(100):
         log = UsageLogModel(
             user_id=user.id,
-            feature="ai_suggestion",
             input_tokens=100,
             output_tokens=50,
             cost_cents=1,

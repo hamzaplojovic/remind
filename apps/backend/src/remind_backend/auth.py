@@ -61,23 +61,23 @@ def check_rate_limit(db: Session, user_id: int) -> int:
         if not rate_limit:
             rate_limit = RateLimitModel(
                 user_id=user_id,
-                request_count=0,
+                requests=0,
                 reset_at=now + timedelta(seconds=settings.rate_limit_window_seconds),
             )
             db.add(rate_limit)
         else:
-            rate_limit.request_count = 0
+            rate_limit.requests = 0
             rate_limit.reset_at = now + timedelta(seconds=settings.rate_limit_window_seconds)
         db.commit()
 
     assert rate_limit is not None  # guaranteed: created above when None
-    if rate_limit.request_count >= settings.rate_limit_requests:
+    if rate_limit.requests >= settings.rate_limit_requests:
         raise QuotaError(
             f"Rate limit exceeded. Maximum {settings.rate_limit_requests} requests per "
             f"{settings.rate_limit_window_seconds} seconds"
         )
 
-    remaining = settings.rate_limit_requests - rate_limit.request_count - 1
+    remaining = settings.rate_limit_requests - rate_limit.requests - 1
     return remaining
 
 
@@ -88,8 +88,7 @@ def get_monthly_quota_used(db: Session, user_id: int) -> int:
 
     count = db.query(UsageLogModel).filter(
         UsageLogModel.user_id == user_id,
-        UsageLogModel.feature == "ai_suggestion",
-        UsageLogModel.timestamp >= month_start,
+        UsageLogModel.created_at >= month_start,
     ).count()
 
     return count
@@ -110,7 +109,6 @@ def log_usage(db: Session, user_id: int, input_tokens: int, output_tokens: int, 
     """Log feature usage for billing."""
     log = UsageLogModel(
         user_id=user_id,
-        feature="ai_suggestion",
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         cost_cents=cost_cents,
@@ -123,7 +121,7 @@ def increment_rate_limit(db: Session, user_id: int) -> None:
     """Increment rate limit counter."""
     rate_limit = db.query(RateLimitModel).filter(RateLimitModel.user_id == user_id).first()
     if rate_limit:
-        rate_limit.request_count += 1
+        rate_limit.requests += 1
         db.commit()
 
 
@@ -141,7 +139,7 @@ def get_usage_stats(db: Session, user: UserModel) -> dict:
 
     total_cost = db.query(UsageLogModel).filter(
         UsageLogModel.user_id == user.id,
-        UsageLogModel.timestamp >= month_start,
+        UsageLogModel.created_at >= month_start,
     ).with_entities(UsageLogModel.cost_cents).all()
 
     this_month_cost_cents = sum(row[0] for row in total_cost)
@@ -149,7 +147,7 @@ def get_usage_stats(db: Session, user: UserModel) -> dict:
     settings = get_settings()
     rate_limit = db.query(RateLimitModel).filter(RateLimitModel.user_id == user.id).first()
     if rate_limit:
-        rate_limit_remaining = max(0, settings.rate_limit_requests - rate_limit.request_count)
+        rate_limit_remaining = max(0, settings.rate_limit_requests - rate_limit.requests)
         rate_limit_reset_at = rate_limit.reset_at.isoformat()
     else:
         rate_limit_remaining = settings.rate_limit_requests

@@ -11,7 +11,6 @@ from sqlalchemy.orm import (
     mapped_column,
     sessionmaker,
 )
-from sqlalchemy.types import JSON
 
 
 class Base(DeclarativeBase):
@@ -27,36 +26,34 @@ class UserModel(Base):
     token: Mapped[str] = mapped_column(String, unique=True, index=True)
     email: Mapped[str] = mapped_column(String)
     plan_tier: Mapped[str] = mapped_column(String)  # free, indie, pro, team
+    active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc),
     )
     updated_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc),
     )
-    active: Mapped[bool] = mapped_column(default=True)
 
     def __repr__(self) -> str:
         return f"<UserModel token={self.token} plan={self.plan_tier}>"
 
 
 class UsageLogModel(Base):
-    """Tracks usage of features for billing."""
+    """Tracks usage for billing."""
 
     __tablename__ = "usage_logs"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    feature: Mapped[str] = mapped_column(String)  # "ai_suggestion", "nudge", etc.
-    timestamp: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
-    )
     input_tokens: Mapped[int] = mapped_column(default=0)
     output_tokens: Mapped[int] = mapped_column(default=0)
-    cost_cents: Mapped[int] = mapped_column()  # Store as cents (integer)
-    metadata_json: Mapped[dict] = mapped_column(JSON, default=dict)
+    cost_cents: Mapped[int] = mapped_column(default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc),
+    )
 
     def __repr__(self) -> str:
-        return f"<UsageLogModel user_id={self.user_id} feature={self.feature} cost={self.cost_cents}¢>"
+        return f"<UsageLogModel user_id={self.user_id} cost={self.cost_cents}¢>"
 
 
 class RateLimitModel(Base):
@@ -66,11 +63,14 @@ class RateLimitModel(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
-    request_count: Mapped[int] = mapped_column(default=0)
+    requests: Mapped[int] = mapped_column(default=0)
     reset_at: Mapped[datetime] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc),
+    )
 
     def __repr__(self) -> str:
-        return f"<RateLimitModel user_id={self.user_id} count={self.request_count}>"
+        return f"<RateLimitModel user_id={self.user_id} count={self.requests}>"
 
 
 # Database session management
