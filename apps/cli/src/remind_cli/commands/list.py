@@ -1,5 +1,7 @@
 """List command - display reminders."""
 
+from typing import Optional
+
 import typer
 
 from remind_database import DatabaseConfig, DatabaseSession
@@ -10,7 +12,7 @@ from remind_cli import output
 def list_cmd(
     all: bool = typer.Option(False, "--all", "-a", help="Show done reminders too"),
     json_output: bool = typer.Option(False, "--json", "-j", help="JSON output"),
-    priority: str | None = typer.Option(None, "--priority", "-p", help="Filter by priority"),
+    priority: Optional[str] = typer.Option(None, "--priority", "-p", help="Filter by priority"),
 ) -> None:
     """List reminders.
 

@@ -1,5 +1,7 @@
 """Login command - authenticate with license token."""
 
+from typing import Optional
+
 import httpx
 import typer
 
@@ -9,7 +11,7 @@ from remind_cli.services.config_service import ConfigService
 from remind_cli import output
 
 
-def _resolve_plan_tier(token: str, backend_url: str | None) -> str:
+def _resolve_plan_tier(token: str, backend_url: Optional[str]) -> str:
     """Query backend for actual plan tier. Falls back to token parsing."""
     if backend_url:
         try:

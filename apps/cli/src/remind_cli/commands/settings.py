@@ -1,5 +1,7 @@
 """Settings command - view and manage configuration."""
 
+from typing import Optional
+
 import typer
 
 from remind_cli.config import load_config
@@ -24,7 +26,7 @@ def _get_plan_display(config_service: ConfigService) -> str:
 
 def settings(
     view: bool = typer.Option(False, "--view", "-v", help="View all settings"),
-    set_key: str | None = typer.Option(None, "--set", "-s", help="Set a key=value"),
+    set_key: Optional[str] = typer.Option(None, "--set", "-s", help="Set a key=value"),
 ) -> None:
     """View and manage Remind settings.
 

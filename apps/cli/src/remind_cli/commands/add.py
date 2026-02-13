@@ -1,6 +1,7 @@
 """Add command - create a new reminder."""
 
 from datetime import datetime
+from typing import Optional
 
 import typer
 
@@ -13,9 +14,9 @@ from remind_cli import output
 
 def add(
     text: str = typer.Argument(..., help="Reminder text"),
-    due: str | None = typer.Option(None, "--due", "-d", help="Due date/time (e.g., 'tomorrow 5pm')"),
+    due: Optional[str] = typer.Option(None, "--due", "-d", help="Due date/time (e.g., 'tomorrow 5pm')"),
     priority: str = typer.Option("medium", "--priority", "-p", help="Priority: high, medium, low"),
-    project: str | None = typer.Option(None, "--project", "-P", help="Project context"),
+    project: Optional[str] = typer.Option(None, "--project", "-P", help="Project context"),
     allow_past_due: bool = typer.Option(False, "--allow-past-due", hidden=True, help="Allow past due dates (testing only)"),
 ) -> None:
     """Add a new reminder.
