@@ -17,6 +17,18 @@ from remind_cli.commands.update import update
 from remind_cli.commands.uninstall import uninstall
 
 
+def scheduler(
+    run: bool = typer.Option(False, "--run", help="Run the scheduler daemon"),
+) -> None:
+    """Background scheduler daemon (internal use)."""
+    if run:
+        from remind_cli.services.scheduler_service import run_scheduler
+        run_scheduler()
+    else:
+        typer.echo("Use --run to start the scheduler daemon")
+        raise typer.Exit(1)
+
+
 def version_callback(value: bool) -> None:
     if value:
         typer.echo(f"remind {__version__}")
@@ -100,3 +112,4 @@ app.command()(register)
 app.command()(upgrade)
 app.command()(update)
 app.command()(uninstall)
+app.command(hidden=True)(scheduler)
