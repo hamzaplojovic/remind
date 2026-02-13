@@ -8,6 +8,7 @@ import sys
 import typer
 
 from remind_cli import __version__, output
+from remind_cli.platform_utils import get_platform
 
 
 def _detect_install_method() -> str:
@@ -56,6 +57,32 @@ def _detect_install_method() -> str:
         return "binary"
 
     return "pip"  # safe default
+
+
+def _restart_scheduler() -> None:
+    """Restart the background scheduler if installed."""
+    try:
+        platform = get_platform()
+        if platform.is_linux:
+            result = subprocess.run(
+                ["systemctl", "--user", "is-active", "remind-scheduler.service"],
+                capture_output=True, timeout=5,
+            )
+            if result.returncode == 0:
+                subprocess.run(
+                    ["systemctl", "--user", "restart", "remind-scheduler.service"],
+                    capture_output=True, timeout=10,
+                )
+                output.success("Scheduler restarted.")
+        elif platform.is_macos:
+            from pathlib import Path
+            plist = Path.home() / "Library" / "LaunchAgents" / "com.remind.scheduler.plist"
+            if plist.exists():
+                subprocess.run(["launchctl", "unload", str(plist)], capture_output=True, timeout=5)
+                subprocess.run(["launchctl", "load", str(plist)], capture_output=True, timeout=5)
+                output.success("Scheduler restarted.")
+    except Exception:
+        pass  # Non-critical
 
 
 def update() -> None:
@@ -129,5 +156,8 @@ def update() -> None:
         output.error("Could not detect installation method.")
         output.hint("Try: pip install --upgrade remind-cli")
         raise typer.Exit(1)
+
+    # Restart scheduler if running
+    _restart_scheduler()
 
     output.blank()
