@@ -1131,7 +1131,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "remind-cli"
-version = "1.0.6"
+version = "1.0.7"
 source = { editable = "apps/cli" }
 dependencies = [
     { name = "dateparser" },

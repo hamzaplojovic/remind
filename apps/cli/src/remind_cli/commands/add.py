@@ -81,7 +81,7 @@ def add(
         # Fall back: try to parse date from the text itself
         if due_dt is None:
             parsed = dateparser_parse(text, settings={"PREFER_DATES_FROM": "future"})
-            if parsed and parsed > datetime.now():
+            if parsed:
                 due_dt = parsed
             else:
                 due_dt = datetime.now()
