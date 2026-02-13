@@ -1131,7 +1131,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "remind-cli"
-version = "1.0.4"
+version = "1.0.5"
 source = { editable = "apps/cli" }
 dependencies = [
     { name = "dateparser" },
@@ -1215,7 +1215,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "remind-shared"
-version = "1.0.0"
+version = "1.0.1"
 source = { editable = "packages/shared" }
 dependencies = [
     { name = "pydantic" },
