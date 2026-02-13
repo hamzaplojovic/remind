@@ -42,7 +42,7 @@ async def polar_webhook(request: Request):
     # Validate webhook signature using Polar SDK
     try:
         event = validate_event(
-            payload=body,
+            body=body,
             headers=dict(request.headers),
             secret=settings.polar_webhook_secret,
         )
