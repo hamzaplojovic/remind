@@ -30,7 +30,9 @@ class UserModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc),
     )
-    expires_at: Mapped[datetime | None] = mapped_column(default=None)
+    updated_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc),
+    )
     active: Mapped[bool] = mapped_column(default=True)
 
     def __repr__(self) -> str:

@@ -40,13 +40,6 @@ def authenticate_token(db: Session, token: str) -> UserModel:
     if not user.active:
         raise AuthError("License is inactive")
 
-    if user.expires_at:
-        expires = user.expires_at
-        if expires.tzinfo is None:
-            expires = expires.replace(tzinfo=timezone.utc)
-        if datetime.now(timezone.utc) > expires:
-            raise AuthError("License has expired")
-
     return user
 
 
