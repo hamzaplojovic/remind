@@ -34,7 +34,8 @@ class GlobalRateLimitMiddleware(BaseHTTPMiddleware):
 
         settings = get_settings()
 
-        if request.url.path == "/health":
+        # Skip rate limiting for health checks and webhooks
+        if request.url.path == "/health" or request.url.path.startswith("/webhooks"):
             return await call_next(request)
 
         client_ip = request.client.host if request.client else "unknown"

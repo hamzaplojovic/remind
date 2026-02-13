@@ -1,12 +1,15 @@
 """Polar webhook handler for processing payments and creating users."""
 
+import base64
+import json
 import logging
 import secrets
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Request, HTTPException
 from sqlalchemy import text
-from polar_sdk.webhooks import validate_event, WebhookVerificationError
+from standardwebhooks.webhooks import Webhook
+from standardwebhooks.webhooks import WebhookVerificationError
 
 from remind_backend.config import get_settings
 from remind_backend.database import get_engine
@@ -39,74 +42,54 @@ async def polar_webhook(request: Request):
     settings = get_settings()
     body = await request.body()
 
-    # Validate webhook signature using Polar SDK
+    # Verify signature using Standard Webhooks (same as polar_sdk but without strict Pydantic parsing)
     try:
-        event = validate_event(
-            body=body,
-            headers=dict(request.headers),
-            secret=settings.polar_webhook_secret,
-        )
+        base64_secret = base64.b64encode(settings.polar_webhook_secret.encode()).decode()
+        wh = Webhook(base64_secret)
+        headers_dict = dict(request.headers)
+        wh.verify(body, headers_dict)
     except WebhookVerificationError as e:
         logger.warning("Invalid webhook signature: %s", e)
         raise HTTPException(status_code=403, detail="Invalid signature")
 
-    event_type = event.type if hasattr(event, "type") else str(event.get("type", ""))
+    event = json.loads(body)
+    event_type = event.get("type", "")
 
     logger.info("Polar webhook received: %s", event_type)
 
     if event_type in ("order.created", "order.paid", "subscription.created"):
-        event_data = event.data if hasattr(event, "data") else event.get("data", {})
-        await _handle_order(event_data)
+        await _handle_order(event.get("data", {}))
     elif event_type == "checkout.updated":
-        event_data = event.data if hasattr(event, "data") else event.get("data", {})
-        status = getattr(event_data, "status", None) or event_data.get("status", "")
-        if status == "succeeded":
-            await _handle_checkout(event_data)
+        data = event.get("data", {})
+        if data.get("status") == "succeeded":
+            await _handle_checkout(data)
     else:
         logger.info("Ignoring event type: %s", event_type)
 
     return {"status": "ok"}
 
 
-async def _handle_checkout(data):
+async def _handle_checkout(data: dict):
     """Process a completed checkout — extract email and product, delegate to _handle_order."""
-    if hasattr(data, "customer_email"):
-        email = data.customer_email
-    else:
-        email = data.get("customer_email") or data.get("customer", {}).get("email")
-
-    if hasattr(data, "product"):
-        product = data.product
-        product_id = getattr(product, "id", "")
-    elif hasattr(data, "product_id"):
-        product_id = data.product_id
-    else:
-        product_id = data.get("product_id", "") or data.get("product", {}).get("id", "")
+    email = data.get("customer_email") or data.get("customer", {}).get("email")
+    product_id = data.get("product_id") or data.get("product", {}).get("id", "")
 
     if not email:
         logger.error("No email in checkout payload: %s", data)
         return
 
-    # Build a minimal dict that _handle_order understands
     await _handle_order({
         "customer": {"email": email},
         "product": {"id": product_id},
     })
 
 
-async def _handle_order(data):
+async def _handle_order(data: dict):
     """Process a completed order — create user and email token."""
-    # Extract customer info — data may be a Pydantic model or dict
-    if hasattr(data, "customer"):
-        customer = data.customer
-        email = getattr(customer, "email", None)
-        product = data.product
-        product_id = getattr(product, "id", "")
-    else:
-        customer = data.get("customer", {})
-        email = customer.get("email") or data.get("customer_email")
-        product = data.get("product", {})
-        product_id = product.get("id", "")
+    customer = data.get("customer", {})
+    email = customer.get("email") or data.get("customer_email")
+    product = data.get("product", {})
+    product_id = product.get("id", "")
 
     if not email:
         logger.error("No email in webhook payload: %s", data)
