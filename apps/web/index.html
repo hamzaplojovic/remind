@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remind — AI-Powered Reminder CLI</title>
-  <meta name="description" content="Remind is an AI-powered CLI that transforms how you manage reminders. Smart suggestions, instant notifications, beautiful organization.">
+  <title>Remind — AI-Powered Reminders for the Terminal</title>
+  <meta name="description" content="The first CLI with native Claude Code integration. Create reminders from conversation, schedule autonomous tasks, and never lose track of what matters.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='24' r='6' fill='%23e8503a'/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,35 +21,18 @@
           },
           colors: {
             paper: {
-              50: '#fdfcfa',
-              100: '#faf7f2',
-              200: '#f0ebe4',
-              300: '#d4cfc7',
-              400: '#b0a99e',
-              500: '#8a8279',
-              600: '#6b645c',
-              700: '#4a4540',
-              800: '#2a2724',
-              900: '#1a1715',
-              950: '#141211',
+              50: '#fdfcfa', 100: '#faf7f2', 200: '#f0ebe4', 300: '#d4cfc7',
+              400: '#b0a99e', 500: '#8a8279', 600: '#6b645c', 700: '#4a4540',
+              800: '#2a2724', 900: '#1a1715', 950: '#141211',
             },
-            coral: {
-              DEFAULT: '#e8503a',
-              light: '#ff6b55',
-              dark: '#c43d2a',
-            },
-            sage: {
-              DEFAULT: '#2d6a4f',
-              light: '#52b788',
-              dark: '#1b4332',
-            },
+            coral: { DEFAULT: '#e8503a', light: '#ff6b55', dark: '#c43d2a' },
+            sage: { DEFAULT: '#2d6a4f', light: '#52b788', dark: '#1b4332' },
           },
         },
       },
     }
   </script>
   <style>
-    /* ——— Theme Variables ——— */
     :root {
       --bg: #faf7f2;
       --bg-elevated: #ffffff;
@@ -78,7 +61,6 @@
       --grain-opacity: 0.15;
     }
 
-    /* ——— Base ——— */
     *, *::before, *::after { box-sizing: border-box; }
 
     body {
@@ -90,7 +72,6 @@
       transition: background-color 0.5s ease, color 0.5s ease;
     }
 
-    /* ——— Grain Texture Overlay ——— */
     body::before {
       content: '';
       position: fixed;
@@ -103,86 +84,38 @@
       background-size: 128px 128px;
     }
 
-    ::selection {
-      background-color: var(--accent);
-      color: white;
-    }
+    ::selection { background-color: var(--accent); color: white; }
 
-    /* ——— Typography ——— */
     .font-display { font-family: 'Young Serif', Georgia, serif; }
     .font-mono { font-family: 'Fira Code', monospace; }
 
-    /* ——— Section Decorative Numbers ——— */
-    .section-number {
-      font-family: 'Young Serif', serif;
-      font-size: clamp(5rem, 12vw, 10rem);
-      line-height: 1;
-      color: var(--border-light);
-      position: absolute;
-      top: -1.5rem;
-      left: -0.5rem;
-      user-select: none;
-      pointer-events: none;
-      transition: color 0.5s ease;
+    .rule { border: none; height: 1px; background: var(--border); transition: background 0.5s ease; }
+    .rule-dotted { border: none; height: 1px; background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 4px, transparent 4px, transparent 10px); }
+
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
 
-    html.dark .section-number { color: var(--border); }
-
-    /* ——— Horizontal Rules ——— */
-    .rule {
-      border: none;
-      height: 1px;
-      background: var(--border);
-      transition: background 0.5s ease;
-    }
-
-    .rule-dotted {
-      border: none;
-      height: 1px;
-      background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 4px, transparent 4px, transparent 10px);
-      transition: background 0.5s ease;
-    }
-
-    /* ——— Terminal Window ——— */
+    /* Terminal */
     .terminal {
       background: var(--bg-terminal);
       border-radius: 10px;
       overflow: hidden;
-      box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.1);
       transition: box-shadow 0.5s ease;
     }
-
     html.dark .terminal {
-      box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
     }
-
-    .terminal-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 18px;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .terminal-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .terminal-body {
-      padding: 24px;
-      font-family: 'Fira Code', monospace;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #f0ebe4;
-      min-height: 260px;
-    }
-
+    .terminal-bar { display: flex; align-items: center; gap: 8px; padding: 14px 18px; background: rgba(0,0,0,0.3); }
+    .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .terminal-body { padding: 24px; font-family: 'Fira Code', monospace; font-size: 14px; line-height: 1.8; color: #f0ebe4; min-height: 280px; }
     .term-prompt { color: var(--accent); }
     .term-cmd { color: #f0ebe4; }
     .term-flag { color: #52b788; }
@@ -190,559 +123,440 @@
     .term-output { color: #b0a99e; }
     .term-highlight { color: var(--accent); }
 
-    /* ——— Typing Cursor ——— */
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      height: 20px;
-      background: var(--accent);
-      vertical-align: text-bottom;
-      animation: cursorBlink 1s step-end infinite;
-    }
+    .cursor { display: inline-block; width: 10px; height: 20px; background: var(--accent); vertical-align: text-bottom; animation: cursorBlink 1s step-end infinite; }
+    @keyframes cursorBlink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
-    @keyframes cursorBlink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-
-    /* ——— Animations ——— */
-    @keyframes revealUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes revealFade {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideRight {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes ticker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-
-    /* ——— Cards ——— */
-    .feature-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 2.5rem;
-      position: relative;
-      transition: all 0.4s ease;
-    }
-
-    .feature-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    }
-
-    html.dark .feature-card:hover {
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .feature-card .card-number {
-      font-family: 'Young Serif', serif;
-      font-size: 3rem;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 1rem;
-      transition: color 0.4s ease;
-    }
-
-    .feature-card:hover .card-number {
-      color: var(--accent);
-    }
-
-    /* ——— Pricing ——— */
-    .pricing-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      padding: 2.5rem;
-      position: relative;
-      transition: all 0.4s ease;
-    }
-
-    .pricing-card.featured {
-      border-color: var(--accent);
-      border-width: 2px;
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-    }
-
-    html.dark .pricing-card:hover {
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    /* ——— Pull Quotes ——— */
-    .pull-quote {
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .pull-quote::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--accent);
-    }
-
-    /* ——— Buttons ——— */
+    /* Buttons */
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      background: var(--accent);
-      color: white;
-      font-weight: 600;
-      font-size: 0.95rem;
-      letter-spacing: 0.02em;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 1rem 2rem; background: var(--accent); color: white;
+      font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+      transition: all 0.3s ease; border: none; cursor: pointer; text-decoration: none;
     }
-
-    .btn-primary:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(232, 80, 58, 0.3);
-    }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(232,80,58,0.3); }
 
     .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      background: transparent;
-      color: var(--text);
-      font-weight: 600;
-      font-size: 0.95rem;
-      letter-spacing: 0.02em;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.3s ease;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 1rem 2rem; background: transparent; color: var(--text);
+      font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+      border: 1px solid var(--border); cursor: pointer; transition: all 0.3s ease; text-decoration: none;
     }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-    .btn-secondary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ——— Theme Toggle ——— */
+    /* Theme Toggle */
     .theme-toggle {
-      width: 44px;
-      height: 24px;
-      border-radius: 12px;
-      background: var(--border);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      border: none;
-      padding: 0;
+      width: 44px; height: 24px; border-radius: 12px; background: var(--border);
+      position: relative; cursor: pointer; transition: background 0.3s ease; border: none; padding: 0;
     }
-
     .theme-toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--bg);
-      transition: transform 0.3s ease, background 0.3s ease;
+      content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--bg); transition: transform 0.3s ease, background 0.3s ease;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-
     html.dark .theme-toggle { background: var(--text-tertiary); }
     html.dark .theme-toggle::after { transform: translateX(20px); }
 
-    /* ——— Ticker ——— */
-    .ticker-track {
-      display: flex;
-      animation: ticker 30s linear infinite;
-      width: max-content;
-    }
-
-    .ticker-track:hover { animation-play-state: paused; }
-
-    /* ——— Code Install Block ——— */
+    /* Install Block */
     .install-block {
-      background: var(--bg-terminal);
-      color: #f0ebe4;
-      padding: 1.25rem 1.5rem;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+      background: var(--bg-terminal); color: #f0ebe4; padding: 1.25rem 1.5rem;
+      font-family: 'Fira Code', monospace; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
       border: 1px solid rgba(255,255,255,0.05);
     }
-
     .install-block .copy-btn {
-      padding: 0.4rem 0.8rem;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #f0ebe4;
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15); color: #f0ebe4;
+      font-family: 'Manrope', sans-serif; font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
+      transition: all 0.2s ease; white-space: nowrap;
     }
+    .install-block .copy-btn:hover { background: rgba(255,255,255,0.2); }
 
-    .install-block .copy-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* ——— Install Tabs ——— */
+    /* Install Tabs */
     .install-tab {
-      padding: 0.5rem 1.25rem;
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      background: transparent;
-      color: var(--text-tertiary);
-      border: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      padding: 0.5rem 1.25rem; font-family: 'Manrope', sans-serif; font-size: 0.8rem;
+      font-weight: 600; letter-spacing: 0.04em; background: transparent;
+      color: var(--text-tertiary); border: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: all 0.2s ease;
     }
-
     .install-tab:first-child { border-radius: 4px 0 0 0; }
     .install-tab:last-child { border-radius: 0 4px 0 0; border-left: none; }
     .install-tab:not(:first-child):not(:last-child) { border-left: none; }
+    .install-tab:hover { color: var(--text-secondary); }
+    .install-tab.active { background: var(--bg-terminal); color: #f0ebe4; border-color: rgba(255,255,255,0.05); border-bottom-color: var(--bg-terminal); }
 
-    .install-tab:hover {
-      color: var(--text-secondary);
+    /* Cards */
+    .benefit-card {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      padding: 2.5rem; position: relative; transition: all 0.4s ease;
+    }
+    .benefit-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    html.dark .benefit-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+
+    /* Pricing */
+    .pricing-card {
+      background: var(--bg-elevated); border: 1px solid var(--border);
+      padding: 2.5rem; transition: all 0.4s ease;
+    }
+    .pricing-card.featured { border-color: var(--accent); border-width: 2px; }
+    .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+    html.dark .pricing-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+
+    /* Mobile Nav */
+    .mobile-menu {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem; transition: background 0.5s ease;
+    }
+    .mobile-menu.open { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 20px; height: 2px; background: var(--text); margin: 4px 0; transition: all 0.3s ease; }
+
+    @media (max-width: 767px) {
+      .hamburger { display: block; }
     }
 
-    .install-tab.active {
-      background: var(--bg-terminal);
-      color: #f0ebe4;
-      border-color: rgba(255,255,255,0.05);
-      border-bottom-color: var(--bg-terminal);
+    /* Notification toast animation */
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
     }
+    .toast-animate { animation: slideInRight 0.4s ease-out; }
 
-    /* ——— Form Inputs ——— */
-    .form-input {
-      width: 100%;
-      padding: 0.875rem 1rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'Manrope', sans-serif;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      outline: none;
+    /* Email input */
+    .email-input {
+      width: 100%; padding: 0.875rem 1rem; background: var(--bg-elevated);
+      border: 1px solid var(--border); color: var(--text);
+      font-family: 'Manrope', sans-serif; font-size: 0.95rem;
+      transition: all 0.3s ease; outline: none;
     }
-
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232, 80, 58, 0.1);
-    }
-
-    .form-input::placeholder { color: var(--text-tertiary); }
-
-    /* ——— Responsive ——— */
-    @media (max-width: 768px) {
-      .section-number { font-size: 4rem; }
-    }
+    .email-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,80,58,0.1); }
+    .email-input::placeholder { color: var(--text-tertiary); }
   </style>
 </head>
 
 <body>
-  <!-- ═══════════ NAVIGATION ═══════════ -->
+  <!-- NAV -->
   <nav class="sticky top-0 z-50 transition-colors duration-500" style="background: var(--bg); border-bottom: 1px solid var(--border);">
     <div class="max-w-7xl mx-auto px-6 lg:px-10">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo -->
         <a href="index.html" class="font-display text-2xl tracking-tight" style="color: var(--text);">
           remind<span style="color: var(--accent);">.</span>
         </a>
 
-        <!-- Nav Links -->
         <div class="hidden md:flex items-center gap-10">
           <a href="#features" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Features</a>
           <a href="#pricing" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Pricing</a>
           <a href="docs/index.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Docs</a>
-          <a href="compare.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Compare</a>
-          <a href="blog/index.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Blog</a>
-          <a href="changelog.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Changelog</a>
+          <a href="integrations.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Claude Code</a>
         </div>
 
-        <!-- Right Side -->
         <div class="flex items-center gap-5">
           <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
           <a href="#install" class="btn-primary text-sm hidden sm:inline-flex" style="padding: 0.6rem 1.5rem;">Get Started</a>
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </div>
     </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#features" class="text-sm font-medium" style="color: var(--text-secondary);">Features</a>
+      <a href="#pricing" class="text-sm font-medium" style="color: var(--text-secondary);">Pricing</a>
+      <a href="docs/index.html" class="text-sm font-medium" style="color: var(--text-secondary);">Docs</a>
+      <a href="integrations.html" class="text-sm font-medium" style="color: var(--text-secondary);">Claude Code</a>
+      <a href="#install" class="btn-primary text-sm justify-center" style="padding: 0.6rem 1.5rem; margin-top: 0.5rem;">Get Started</a>
+    </div>
   </nav>
 
-  <!-- ═══════════ HERO ═══════════ -->
-  <section class="pt-16 md:pt-24 pb-12 px-6 lg:px-10">
+  <!-- HERO -->
+  <section class="pt-20 md:pt-28 pb-16 md:pb-24 px-6 lg:px-10 relative overflow-hidden">
+    <!-- Ambient glow -->
+    <div style="position: absolute; top: -200px; right: -100px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(232,80,58,0.08) 0%, transparent 70%); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: -300px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(45,106,79,0.06) 0%, transparent 70%); pointer-events: none;"></div>
+
     <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-        <!-- Left: Copy -->
-        <div>
-          <p class="text-sm font-semibold tracking-widest uppercase mb-6 reveal" style="color: var(--accent); letter-spacing: 0.15em;">AI-Powered CLI</p>
+      <!-- Main hero content — stacked, centered -->
+      <div class="text-center max-w-4xl mx-auto mb-16 md:mb-20">
+        <div class="reveal" style="margin-bottom: 2rem;">
+          <span class="inline-block text-xs font-bold tracking-widest uppercase px-4 py-2" style="color: var(--accent); letter-spacing: 0.2em; border: 1px solid var(--accent); opacity: 0.9;">First CLI with native Claude Code integration</span>
+        </div>
 
-          <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8 reveal reveal-delay-1" style="color: var(--text);">
-            Never forget<br>what matters.
-          </h1>
+        <h1 class="font-display leading-[1.0] mb-8 reveal reveal-delay-1" style="color: var(--text); font-size: clamp(3rem, 8vw, 6.5rem);">
+          Your AI works<br>
+          <span style="color: var(--accent); position: relative; display: inline-block;">
+            while you sleep.
+            <svg style="position: absolute; bottom: -4px; left: 0; width: 100%; height: 8px; overflow: visible;" viewBox="0 0 400 8" preserveAspectRatio="none"><path d="M0 5 Q100 0 200 5 Q300 10 400 5" stroke="var(--accent)" stroke-width="2.5" fill="none" opacity="0.5"/></svg>
+          </span>
+        </h1>
 
-          <p class="text-lg md:text-xl leading-relaxed mb-10 max-w-lg reveal reveal-delay-2" style="color: var(--text-secondary);">
-            Remind transforms vague thoughts into smart, prioritized reminders — right from your terminal. AI suggests the best timing, you stay focused.
-          </p>
+        <p class="text-xl md:text-2xl leading-relaxed mb-12 max-w-2xl mx-auto reveal reveal-delay-2" style="color: var(--text-secondary); font-weight: 300;">
+          Schedule Claude Code to run tests at 3am. Create reminders mid-conversation. Get nudged until it's done.
+          <strong style="color: var(--text); font-weight: 600;">All from your terminal.</strong>
+        </p>
 
-          <div class="flex flex-wrap gap-4 mb-10 reveal reveal-delay-3">
-            <a href="#install" class="btn-primary">
-              Install Now
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <a href="#features" class="btn-secondary">See How It Works</a>
-          </div>
-
-          <!-- Platform badges -->
-          <div class="flex items-center gap-3 mb-4 reveal reveal-delay-4">
-            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 0.3rem 0.75rem; border: 1px solid var(--border); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-secondary); transition: border-color 0.5s ease;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-              macOS
-            </span>
-            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 0.3rem 0.75rem; border: 1px solid var(--border); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-secondary); transition: border-color 0.5s ease;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a7.3 7.3 0 0 0 .067.57c.104.7.26 1.316.456 1.86.328.908.763 1.58 1.212 2.104.45.525.904.893 1.332 1.17a4.85 4.85 0 0 0 1.084.545 3 3 0 0 0 .483.124c.152.03.254.038.254.038l.024-.003c.086.01.182.01.293-.003a2.87 2.87 0 0 0 .594-.1c.3-.082.633-.224.96-.424.327-.2.66-.462.98-.793.682-.707 1.05-1.457 1.278-2.121.227-.664.316-1.24.356-1.637a7.8 7.8 0 0 0 .027-.38l.003-.085c.001-.024.001-.024.001-.024 0-.18-.105-.258-.105-.258-.2.2-.453.326-.668.398-.215.07-.384.098-.488.098-.104 0-.194-.015-.265-.04a.6.6 0 0 1-.17-.096.47.47 0 0 1-.104-.144.77.77 0 0 1-.055-.198 1.4 1.4 0 0 1-.019-.272c0-.217.046-.476.126-.76.08-.283.194-.587.327-.9a6 6 0 0 0 .14-.36c.328-.904.637-2.074.33-3.574-.184-.905-.559-1.725-1.021-2.42-.462-.696-1.007-1.27-1.562-1.72A8.5 8.5 0 0 0 12.504 0z"/></svg>
-              Linux
-            </span>
-          </div>
-
-          <!-- Install tabs -->
-          <div class="reveal reveal-delay-4" id="install">
+        <div class="reveal reveal-delay-3" id="install">
+          <div class="inline-flex flex-col items-center gap-4">
             <div style="display: flex; gap: 0; margin-bottom: -1px; position: relative; z-index: 1;">
-              <button class="install-tab active" data-target="tab-uv" onclick="switchInstallTab(this, 'tab-uv')">uv (recommended)</button>
-              <button class="install-tab" data-target="tab-pip" onclick="switchInstallTab(this, 'tab-pip')">pip</button>
-              <button class="install-tab" data-target="tab-curl" onclick="switchInstallTab(this, 'tab-curl')">curl</button>
+              <button class="install-tab active" onclick="switchInstallTab(this, 'tab-uv')">uv (recommended)</button>
+              <button class="install-tab" onclick="switchInstallTab(this, 'tab-pip')">pip</button>
             </div>
-            <div class="install-block" id="tab-uv">
-              <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+            <div style="min-width: 380px;">
+              <div class="install-block" id="tab-uv">
+                <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+              </div>
+              <div class="install-block" id="tab-pip" style="display:none;">
+                <code><span style="color:#52b788;">$</span> pip install remind-cli</code>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+              </div>
             </div>
-            <div class="install-block" id="tab-pip" style="display:none;">
-              <code><span style="color:#52b788;">$</span> pip install remind-cli</code>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
-            </div>
-            <div class="install-block" id="tab-curl" style="display:none;">
-              <code><span style="color:#52b788;">$</span> curl -fsSL remind.hamzaplojovic.blog/install | sh</code>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('curl -fsSL remind.hamzaplojovic.blog/install | sh');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+            <p class="text-sm" style="color: var(--text-tertiary);">Free forever. No account required. <a href="#pricing" style="color: var(--accent); text-decoration: underline; text-underline-offset: 3px;">See plans</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two terminals side by side — showing the range -->
+      <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto reveal reveal-delay-4">
+        <!-- Left: Claude Code conversation (interactive) -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">Claude Code</span>
+          </div>
+          <div class="terminal-body" id="terminalBody" style="min-height: 220px;">
+            <div id="terminalContent"></div>
+            <div class="term-line">
+              <span class="term-flag">You:</span> <span id="terminalTyping"></span><span class="cursor" id="terminalCursor"></span>
             </div>
           </div>
         </div>
 
-        <!-- Right: Terminal -->
-        <div class="reveal reveal-delay-2">
-          <div class="terminal">
-            <div class="terminal-bar">
-              <div class="terminal-dot" style="background: #ff5f57;"></div>
-              <div class="terminal-dot" style="background: #febc2e;"></div>
-              <div class="terminal-dot" style="background: #28c840;"></div>
-              <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">remind — zsh</span>
-            </div>
-            <div class="terminal-body" id="terminalBody">
-              <div id="terminalContent"></div>
-              <div class="term-line">
-                <span class="term-prompt">~</span> <span id="terminalTyping"></span><span class="cursor" id="terminalCursor"></span>
-              </div>
-            </div>
+        <!-- Right: Classic CLI (static demo) -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">Terminal</span>
+          </div>
+          <div class="terminal-body" style="min-height: 220px; font-size: 13px; padding: 20px;">
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"deploy v2"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"friday 3pm"</span></div>
+            <div style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #15 · Due: Fri, 3:00 PM · Med</span></div>
+            <div style="border-top: 1px solid #2a2724; margin: 10px 0;"></div>
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind list</span></div>
+            <div style="padding-left:1rem;margin-top:4px;"><span style="color:#b0a99e;">12</span>  <span style="color:#e8503a;">HIGH</span>  <span style="color: #f0ebe4;">Fix auth bug</span> <span style="color:#b0a99e;">· Wed 9am</span></div>
+            <div style="padding-left:1rem;"><span style="color:#b0a99e;">14</span>  <span style="color:#f0c674;">MED</span> &nbsp;<span style="color: #f0ebe4;">Review PR #89</span> <span style="color:#b0a99e;">· Thu 2pm</span></div>
+            <div style="padding-left:1rem;"><span style="color:#b0a99e;">15</span>  <span style="color:#f0c674;">MED</span> &nbsp;<span style="color: #f0ebe4;">Deploy v2</span> <span style="color:#b0a99e;">· Fri 3pm</span></div>
+            <div style="border-top: 1px solid #2a2724; margin: 10px 0;"></div>
+            <div><span class="term-prompt">~</span> <span class="term-cmd">remind done</span> <span style="color:#f0c674;">12</span></div>
+            <div style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Done:</span> <span style="color: #f0c674; text-decoration: line-through;">Fix auth bug</span></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════ SOCIAL PROOF TICKER ═══════════ -->
-  <div class="py-6 overflow-hidden" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-    <div class="ticker-track">
-      <div class="flex items-center gap-16 px-8">
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Claude Code integration</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS and Linux</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via uv or pip</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">AI-powered smart suggestions</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Background notifications</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Open source CLI</span>
-        <span style="color: var(--border);">&#9670;</span>
-      </div>
-      <div class="flex items-center gap-16 px-8" aria-hidden="true">
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Claude Code integration</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS and Linux</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via uv or pip</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">AI-powered smart suggestions</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Background notifications</span>
-        <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Open source CLI</span>
-        <span style="color: var(--border);">&#9670;</span>
-      </div>
+  <!-- CREDIBILITY BAR -->
+  <div class="py-5 px-6 lg:px-10" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-12 gap-y-3">
+      <a href="https://pypi.org/project/remind-cli/" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase transition-colors" style="color: var(--text-tertiary); letter-spacing: 0.08em; text-decoration: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.6;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Published on PyPI
+      </a>
+      <span style="color: var(--border);">|</span>
+      <span class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="color: var(--text-tertiary); letter-spacing: 0.08em;">
+        7 MCP Tools
+      </span>
+      <span style="color: var(--border);">|</span>
+      <span class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="color: var(--text-tertiary); letter-spacing: 0.08em;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.6;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+        Agent Reminders
+      </span>
+      <span style="color: var(--border);">|</span>
+      <span class="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="color: var(--text-tertiary); letter-spacing: 0.08em;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.6;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        macOS + Linux
+      </span>
     </div>
   </div>
 
-  <!-- ═══════════ FEATURES ═══════════ -->
-  <section id="features" class="py-24 md:py-32 px-6 lg:px-10">
+  <!-- PAIN POINT -->
+  <section class="py-24 md:py-32 px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
-      <!-- Section Header -->
-      <div class="max-w-2xl mb-20 reveal">
-        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Features</p>
-        <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
-          Everything you need,<br>nothing you don't.
+      <div class="max-w-3xl mx-auto text-center reveal">
+        <p class="text-sm font-semibold tracking-widest uppercase mb-6" style="color: var(--accent); letter-spacing: 0.15em;">The Problem</p>
+        <h2 class="font-display text-3xl md:text-4xl lg:text-5xl leading-tight mb-8" style="color: var(--text);">
+          You think of something important.<br>
+          <span style="color: var(--text-tertiary);">Then you forget it.</span>
         </h2>
-        <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
-          Remind is built for people who live in the terminal. No Electron apps, no browser tabs, no distractions.
+        <p class="text-lg leading-relaxed max-w-2xl mx-auto" style="color: var(--text-secondary);">
+          You're deep in code. A thought hits — "need to update that API before Friday." You'll remember later. You won't. The tools that could help need you to leave your terminal, open an app, navigate menus. By then, the thought is gone.
         </p>
       </div>
 
-      <!-- Feature Hero Card -->
-      <div class="feature-card mb-6 reveal" style="padding: 3rem;">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div class="card-number">01</div>
-            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">AI-Enhanced Reminders</h3>
-            <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-              Type naturally. Remind's AI parses your intent, suggests optimal timing, assigns priority, and refines the text — all in milliseconds.
-            </p>
-            <div class="install-block" style="max-width: 420px;">
-              <code><span style="color:#52b788;">$</span> remind add <span style="color:#f0c674;">"deploy by friday"</span></code>
+      <div class="grid md:grid-cols-3 gap-8 mt-16 max-w-4xl mx-auto">
+        <div class="text-center reveal reveal-delay-1">
+          <div class="font-display text-5xl mb-3" style="color: var(--border);">1</div>
+          <p class="text-sm font-semibold mb-2" style="color: var(--text);">Context switching kills flow</p>
+          <p class="text-sm" style="color: var(--text-tertiary);">Opening Todoist or Apple Reminders means leaving your terminal. Your brain loses its place.</p>
+        </div>
+        <div class="text-center reveal reveal-delay-2">
+          <div class="font-display text-5xl mb-3" style="color: var(--border);">2</div>
+          <p class="text-sm font-semibold mb-2" style="color: var(--text);">Manual entry is friction</p>
+          <p class="text-sm" style="color: var(--text-tertiary);">Typing into forms, picking dates from calendars, clicking priority dropdowns. For a five-word reminder.</p>
+        </div>
+        <div class="text-center reveal reveal-delay-3">
+          <div class="font-display text-5xl mb-3" style="color: var(--border);">3</div>
+          <p class="text-sm font-semibold mb-2" style="color: var(--text);">No tool talks to your AI</p>
+          <p class="text-sm" style="color: var(--text-tertiary);">You're coding with Claude, but it can't remember things for you. Until now.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
+
+  <!-- CLAUDE CODE SHOWCASE -->
+  <section id="claude-code" class="py-24 md:py-32 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="reveal">
+          <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">The Headline Feature</p>
+          <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
+            Claude Code<br>remembers for you.
+          </h2>
+          <p class="text-lg leading-relaxed mb-8" style="color: var(--text-secondary);">
+            Remind ships as an MCP server. Connect it to Claude Code and your AI gains the ability to create, manage, and complete reminders — right inside your coding session. No commands to memorize. Just talk.
+          </p>
+
+          <div class="space-y-4 mb-8">
+            <div class="flex gap-3 items-start">
+              <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">7 MCP tools</strong> — add, list, complete, search, update, delete, and schedule agent tasks</span>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">Agent reminders</strong> — schedule Claude to run tasks autonomously at a future time</span>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span style="color: var(--accent-secondary); margin-top: 2px;">&#10003;</span>
+              <span class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text);">One-line setup</strong> — add to <code class="font-mono" style="color: var(--accent);">~/.claude/settings.json</code> and you're connected</span>
             </div>
           </div>
-          <div class="hidden md:block" style="text-align: right;">
-            <div style="display: inline-block; text-align: left; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 2; color: var(--text-tertiary);">
-              <div><span style="color: var(--accent);">input</span>&nbsp;&nbsp;&nbsp;→ "deploy by friday"</div>
-              <div><span style="color: var(--accent-secondary);">parsed</span>&nbsp;&nbsp;→ Deploy by Friday</div>
-              <div><span style="color: var(--accent-secondary);">due</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Fri, 5:00 PM</div>
-              <div><span style="color: var(--accent-secondary);">priority</span>&nbsp;→ High</div>
-              <div><span style="color: var(--accent-secondary);">saved</span>&nbsp;&nbsp;&nbsp;→ ✓ #42</div>
+
+          <a href="integrations.html" class="btn-secondary">
+            Full Claude Code Guide
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <!-- Agent reminder demo -->
+          <div class="terminal" style="margin-bottom: 1rem;">
+            <div class="terminal-bar">
+              <div class="terminal-dot" style="background: #ff5f57;"></div>
+              <div class="terminal-dot" style="background: #febc2e;"></div>
+              <div class="terminal-dot" style="background: #28c840;"></div>
+              <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">Claude Code — Agent Reminder</span>
             </div>
+            <div class="terminal-body" style="min-height: auto; font-size: 13px; padding: 20px;">
+              <div><span class="term-flag">You:</span> <span class="term-string">"At 9am tomorrow, run the test suite</span></div>
+              <div><span class="term-string">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and fix any failures"</span></div>
+              <div style="margin-top: 12px;"><span class="term-flag">Claude:</span> <span style="color: #f59e0b;">&#9888;</span> <span class="term-cmd">Agent reminder #16 scheduled.</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Task: run tests and fix failures</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">When: Tomorrow, 9:00 AM</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Directory: ~/myproject</span></div>
+              <div style="margin-top: 12px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6b645c;">Claude will execute this autonomously</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #6b645c;">at the scheduled time.</span></div>
+            </div>
+          </div>
+
+          <!-- Notification toast -->
+          <div class="toast-animate" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); transition: all 0.5s ease;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center;">
+                <span style="color: white; font-size: 10px; font-weight: 800;">R</span>
+              </div>
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Remind</span>
+              <span style="font-size: 0.7rem; color: var(--text-tertiary); margin-left: auto;">9:00 AM</span>
+            </div>
+            <p style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin: 0 0 2px;">Agent Task Starting</p>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Running tests and fixing failures in ~/myproject</p>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- ── Feature 02: Natural Language Dates ── -->
-      <div class="feature-card mb-6 reveal" style="padding: 3rem;">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
+
+  <!-- 3 BENEFITS -->
+  <section id="features" class="py-24 md:py-32 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="max-w-2xl mb-16 reveal">
+        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">How It Works</p>
+        <h2 class="font-display text-4xl md:text-5xl leading-tight" style="color: var(--text);">
+          Three things.<br>Done well.
+        </h2>
+      </div>
+
+      <!-- Benefit 1: AI-Powered -->
+      <div class="benefit-card mb-6 reveal" style="padding: 3rem;">
         <div class="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div class="card-number">02</div>
-            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">Speak Naturally</h3>
+            <div style="font-family: 'Young Serif', serif; font-size: 3rem; color: var(--border); line-height: 1; margin-bottom: 1rem; transition: color 0.4s ease;">01</div>
+            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">AI That Actually Helps</h3>
             <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-              Type dates like you think them. Remind uses <code class="font-mono text-sm" style="color: var(--accent);">dateparser</code> to understand dozens of natural language date formats — no rigid syntax required.
+              Type naturally. Remind's AI parses your intent, suggests the right time, assigns priority, and refines the text. It works in the CLI and through Claude Code — your choice.
             </p>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
               <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"tomorrow 5pm"</span>
               <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"next friday"</span>
               <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"in 2 hours"</span>
               <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"end of month"</span>
-              <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"monday 9am"</span>
-              <span style="font-family: 'Fira Code', monospace; font-size: 0.8rem; padding: 0.3rem 0.75rem; background: var(--border-light); color: var(--text-secondary); transition: background 0.5s ease;">"3 days from now"</span>
             </div>
           </div>
-          <div class="hidden md:block">
-            <div class="terminal" style="font-size: 13px;">
-              <div class="terminal-bar">
-                <div class="terminal-dot" style="background: #ff5f57;"></div>
-                <div class="terminal-dot" style="background: #febc2e;"></div>
-                <div class="terminal-dot" style="background: #28c840;"></div>
-              </div>
-              <div class="terminal-body" style="padding: 20px;">
-                <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"standup"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"tomorrow 9am"</span></div>
-                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #6</span> <span style="color:#b0a99e;">· Due: Tomorrow, 9:00 AM</span></div>
-                <div class="term-line" style="margin-top:12px;"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"ship hotfix"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"in 2 hours"</span> <span style="color:#52b788;">--priority</span> <span style="color:#f0c674;">high</span></div>
-                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #7</span> <span style="color:#b0a99e;">· Due: Today, 4:30 PM</span> <span style="color:#e8503a;">· High</span></div>
-                <div class="term-line" style="margin-top:12px;"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"quarterly review"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"end of month"</span></div>
-                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #8</span> <span style="color:#b0a99e;">· Due: Feb 28, 5:00 PM</span></div>
-              </div>
+          <div class="hidden md:block" style="text-align: right;">
+            <div style="display: inline-block; text-align: left; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 2; color: var(--text-tertiary);">
+              <div><span style="color: var(--accent);">input</span>&nbsp;&nbsp;&nbsp;&#8594; "deploy by friday"</div>
+              <div><span style="color: var(--accent-secondary);">parsed</span>&nbsp;&nbsp;&#8594; Deploy by Friday</div>
+              <div><span style="color: var(--accent-secondary);">due</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8594; Fri, 5:00 PM</div>
+              <div><span style="color: var(--accent-secondary);">priority</span>&nbsp;&#8594; High</div>
+              <div><span style="color: var(--accent-secondary);">saved</span>&nbsp;&nbsp;&nbsp;&#8594; #42</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── Feature 03: Notifications + Nudges ── -->
-      <div class="feature-card mb-6 reveal" style="padding: 3rem;">
+      <!-- Benefit 2: Notifications -->
+      <div class="benefit-card mb-6 reveal" style="padding: 3rem;">
         <div class="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div class="card-number">03</div>
-            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">Notifications That Escalate</h3>
+            <div style="font-family: 'Young Serif', serif; font-size: 3rem; color: var(--border); line-height: 1; margin-bottom: 1rem; transition: color 0.4s ease;">02</div>
+            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">Notifications That Won't Let You Forget</h3>
             <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
-              Native OS notifications with sound — AppleScript on macOS, D-Bus on Linux. Miss one? Remind nudges you again at <strong style="color: var(--text);">30 min</strong>, <strong style="color: var(--text);">1 hour</strong>, and <strong style="color: var(--text);">2 hours</strong>. Configurable intervals.
+              Native OS notifications with sound. Miss one? Remind nudges you again at <strong style="color: var(--text);">30 min</strong>, <strong style="color: var(--text);">1 hour</strong>, and <strong style="color: var(--text);">2 hours</strong>. Runs as a system service — survives reboots, uses zero resources when idle.
             </p>
             <!-- Nudge timeline -->
-            <div style="display: flex; align-items: center; gap: 0; margin-top: 1rem;">
-              <div style="text-align: center; flex: 1;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent-secondary); margin: 0 auto 6px;"></div>
-                <div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">Due</div>
-              </div>
+            <div style="display: flex; align-items: center; gap: 0; margin-top: 1rem; max-width: 360px;">
+              <div style="text-align: center; flex: 1;"><div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent-secondary); margin: 0 auto 6px;"></div><div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">Due</div></div>
               <div style="flex: 2; height: 2px; background: linear-gradient(to right, var(--accent-secondary), var(--accent)); margin-bottom: 16px;"></div>
-              <div style="text-align: center; flex: 1;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent); opacity: 0.6; margin: 0 auto 6px;"></div>
-                <div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+30m</div>
-              </div>
+              <div style="text-align: center; flex: 1;"><div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent); opacity: 0.6; margin: 0 auto 6px;"></div><div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+30m</div></div>
               <div style="flex: 2; height: 2px; background: var(--accent); opacity: 0.4; margin-bottom: 16px;"></div>
-              <div style="text-align: center; flex: 1;">
-                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent); opacity: 0.8; margin: 0 auto 6px;"></div>
-                <div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+1h</div>
-              </div>
+              <div style="text-align: center; flex: 1;"><div style="width: 10px; height: 10px; border-radius: 50%; background: var(--accent); opacity: 0.8; margin: 0 auto 6px;"></div><div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+1h</div></div>
               <div style="flex: 2; height: 2px; background: var(--accent); opacity: 0.6; margin-bottom: 16px;"></div>
-              <div style="text-align: center; flex: 1;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent); margin: 0 auto 6px;"></div>
-                <div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+2h</div>
-              </div>
+              <div style="text-align: center; flex: 1;"><div style="width: 12px; height: 12px; border-radius: 50%; background: var(--accent); margin: 0 auto 6px;"></div><div style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-tertiary);">+2h</div></div>
             </div>
           </div>
           <div class="hidden md:block">
-            <!-- macOS notification mockup -->
             <div style="max-width: 340px; margin-left: auto;">
               <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); transition: all 0.5s ease; margin-bottom: 12px;">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                  <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-size: 10px; font-weight: 800;">R</span>
-                  </div>
+                  <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 10px; font-weight: 800;">R</span></div>
                   <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Remind</span>
                   <span style="font-size: 0.7rem; color: var(--text-tertiary); margin-left: auto;">now</span>
                 </div>
@@ -751,9 +565,7 @@
               </div>
               <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.5s ease; opacity: 0.7; transform: scale(0.97);">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                  <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-size: 10px; font-weight: 800;">R</span>
-                  </div>
+                  <div style="width: 20px; height: 20px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 10px; font-weight: 800;">R</span></div>
                   <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Remind</span>
                   <span style="font-size: 0.7rem; color: var(--text-tertiary); margin-left: auto;">30m ago</span>
                 </div>
@@ -765,100 +577,34 @@
         </div>
       </div>
 
-      <!-- ── Feature 04 + 05: Platform Scheduler + Project Context ── -->
-      <div class="grid md:grid-cols-2 gap-6 mb-6">
-        <div class="feature-card reveal reveal-delay-1" style="padding: 2.5rem;">
-          <div class="card-number">04</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Platform-Native Scheduler</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">
-            Runs as a proper system service — <code class="font-mono text-sm" style="color: var(--accent);">LaunchAgent</code> on macOS, <code class="font-mono text-sm" style="color: var(--accent);">systemd</code> on Linux. Survives reboots, uses zero resources when idle.
-          </p>
-          <div class="terminal" style="font-size: 12px;">
-            <div class="terminal-bar">
-              <div class="terminal-dot" style="background: #ff5f57;"></div>
-              <div class="terminal-dot" style="background: #febc2e;"></div>
-              <div class="terminal-dot" style="background: #28c840;"></div>
-            </div>
-            <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind scheduler</span> <span style="color:#52b788;">--run</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Scheduler started</span></div>
-              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;Checking every 1s</span></div>
-              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;Nudges: 30m, 1h, 2h</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Listening for due reminders...</span></div>
-            </div>
+      <!-- Benefit 3: Terminal-native -->
+      <div class="benefit-card reveal" style="padding: 3rem;">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <div style="font-family: 'Young Serif', serif; font-size: 3rem; color: var(--border); line-height: 1; margin-bottom: 1rem; transition: color 0.4s ease;">03</div>
+            <h3 class="font-display text-3xl mb-4" style="color: var(--text);">Zero Friction, Zero Bloat</h3>
+            <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+              No Electron. No browser. No Java runtime. Remind is a Python CLI that starts in milliseconds. Add a reminder and you're back to coding in two seconds flat. Search, filter by project, mark done — all without leaving your terminal.
+            </p>
           </div>
-        </div>
-
-        <div class="feature-card reveal reveal-delay-2" style="padding: 2.5rem;">
-          <div class="card-number">05</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Project Context</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">
-            Group reminders by project with <code class="font-mono text-sm" style="color: var(--accent);">--project</code>. Keep work tasks separate from personal. Filter, search, and report per-project.
-          </p>
-          <div class="terminal" style="font-size: 12px;">
-            <div class="terminal-bar">
-              <div class="terminal-dot" style="background: #ff5f57;"></div>
-              <div class="terminal-dot" style="background: #febc2e;"></div>
-              <div class="terminal-dot" style="background: #28c840;"></div>
-            </div>
-            <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"fix auth bug"</span> \</div>
-              <div class="term-line">&nbsp;&nbsp;<span style="color:#52b788;">--project</span> <span style="color:#f0c674;">acme-api</span> \</div>
-              <div class="term-line">&nbsp;&nbsp;<span style="color:#52b788;">--priority</span> <span style="color:#f0c674;">high</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #12</span> <span style="color:#6b645c;">· acme-api</span></div>
-              <div class="term-line" style="margin-top:8px;"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"buy groceries"</span> \</div>
-              <div class="term-line">&nbsp;&nbsp;<span style="color:#52b788;">--project</span> <span style="color:#f0c674;">personal</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #13</span> <span style="color:#6b645c;">· personal</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Feature 06 + 07: Doctor + Report ── -->
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="feature-card reveal reveal-delay-1" style="padding: 2.5rem;">
-          <div class="card-number">06</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Self-Diagnosing</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">
-            <code class="font-mono text-sm" style="color: var(--accent);">remind doctor</code> runs 4 health checks — database, config, license, and scheduler. Catches problems before you notice them.
-          </p>
-          <div class="terminal" style="font-size: 12px;">
-            <div class="terminal-bar">
-              <div class="terminal-dot" style="background: #ff5f57;"></div>
-              <div class="terminal-dot" style="background: #febc2e;"></div>
-              <div class="terminal-dot" style="background: #28c840;"></div>
-            </div>
-            <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind doctor</span></div>
-              <div class="term-line" style="margin-top:6px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Database</span> <span style="color:#6b645c;">·····</span> <span style="color:#52b788;">OK</span></div>
-              <div class="term-line"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Configuration</span> <span style="color:#6b645c;">··</span> <span style="color:#52b788;">OK</span></div>
-              <div class="term-line"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">License</span> <span style="color:#6b645c;">·······</span> <span style="color:#52b788;">Pro</span></div>
-              <div class="term-line"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Scheduler</span> <span style="color:#6b645c;">·····</span> <span style="color:#52b788;">Running</span></div>
-              <div class="term-line" style="margin-top:6px;"><span style="color:#52b788;">All systems healthy.</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="feature-card reveal reveal-delay-2" style="padding: 2.5rem;">
-          <div class="card-number">07</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Usage Reports</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">
-            <code class="font-mono text-sm" style="color: var(--accent);">remind usage</code> shows your stats — total reminders, completed this month, overdue count, AI quota used, and plan tier.
-          </p>
-          <div class="terminal" style="font-size: 12px;">
-            <div class="terminal-bar">
-              <div class="terminal-dot" style="background: #ff5f57;"></div>
-              <div class="terminal-dot" style="background: #febc2e;"></div>
-              <div class="terminal-dot" style="background: #28c840;"></div>
-            </div>
-            <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind usage</span></div>
-              <div class="term-line" style="margin-top:6px;"><span style="color:#b0a99e;">Total</span> <span style="color:#6b645c;">··········</span> <span style="color:#f0ebe4;">47</span></div>
-              <div class="term-line"><span style="color:#b0a99e;">Done this month</span> <span style="color:#6b645c;">·</span> <span style="color:#52b788;">23</span></div>
-              <div class="term-line"><span style="color:#b0a99e;">Overdue</span> <span style="color:#6b645c;">········</span> <span style="color:#e8503a;">2</span></div>
-              <div class="term-line"><span style="color:#b0a99e;">Due today</span> <span style="color:#6b645c;">······</span> <span style="color:#f0c674;">5</span></div>
-              <div class="term-line"><span style="color:#b0a99e;">AI used</span> <span style="color:#6b645c;">········</span> <span style="color:#f0ebe4;">18 / 100</span></div>
-              <div class="term-line"><span style="color:#b0a99e;">Plan</span> <span style="color:#6b645c;">···········</span> <span style="color:#52b788;">Indie</span></div>
+          <div class="hidden md:block">
+            <div class="terminal" style="font-size: 13px;">
+              <div class="terminal-bar">
+                <div class="terminal-dot" style="background: #ff5f57;"></div>
+                <div class="terminal-dot" style="background: #febc2e;"></div>
+                <div class="terminal-dot" style="background: #28c840;"></div>
+              </div>
+              <div class="terminal-body" style="padding: 20px; min-height: auto;">
+                <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind add</span> <span style="color:#f0c674;">"ship hotfix"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"in 2 hours"</span> <span style="color:#52b788;">--priority</span> <span style="color:#f0c674;">high</span></div>
+                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Saved #7</span> <span style="color:#b0a99e;">· Due: Today, 4:30 PM</span> <span style="color:#e8503a;">· High</span></div>
+                <div style="border-top: 1px solid #2a2724; margin: 12px 0;"></div>
+                <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind list</span></div>
+                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#b0a99e;"> 5</span>  <span style="color: #f0ebe4;">Deploy v2.0</span> <span style="color:#b0a99e;">· Fri, 3pm</span></div>
+                <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;"> 7</span>  <span style="color: #f0c674;">Ship hotfix</span> <span style="color:#b0a99e;">· Today, 4:30pm</span> <span style="color:#e8503a;">· High</span></div>
+                <div style="border-top: 1px solid #2a2724; margin: 12px 0;"></div>
+                <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind done</span> <span style="color:#f0c674;">7</span></div>
+                <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Completed:</span> <span style="color: #f0c674; text-decoration: line-through;">Ship hotfix</span></div>
+              </div>
             </div>
           </div>
         </div>
@@ -868,83 +614,38 @@
 
   <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
 
-  <!-- ═══════════ HOW IT WORKS ═══════════ -->
-  <section class="py-24 md:py-32 px-6 lg:px-10">
-    <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-20 reveal">
-        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">How It Works</p>
-        <h2 class="font-display text-4xl md:text-5xl leading-tight" style="color: var(--text);">
-          Three commands.<br>That's the whole API.
-        </h2>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-12 md:gap-8">
-        <!-- Step 1 -->
-        <div class="reveal reveal-delay-1">
-          <div class="font-display text-6xl mb-6" style="color: var(--border);">1</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Install</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">One command. uv, pip, or download directly. Works on macOS and Linux.</p>
-          <div class="install-block">
-            <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="reveal reveal-delay-2">
-          <div class="font-display text-6xl mb-6" style="color: var(--border);">2</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Add</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">Write reminders in plain English. The AI handles parsing, timing, and priority for you.</p>
-          <div class="install-block">
-            <code><span style="color:#52b788;">$</span> remind add <span style="color:#f0c674;">"task"</span> <span style="color:#52b788;">--due</span> <span style="color:#f0c674;">"5pm"</span></code>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="reveal reveal-delay-3">
-          <div class="font-display text-6xl mb-6" style="color: var(--border);">3</div>
-          <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Done</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">List, search, complete. Remind stays out of your way until you need it — then it's instant.</p>
-          <div class="install-block">
-            <code><span style="color:#52b788;">$</span> remind done <span style="color:#f0c674;">1</span></code>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
-
-  <!-- ═══════════ PRICING ═══════════ -->
+  <!-- PRICING -->
   <section id="pricing" class="py-24 md:py-32 px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-20 reveal">
+      <div class="max-w-2xl mb-16 reveal">
         <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Pricing</p>
         <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
-          Honest pricing.<br>No surprises.
+          Free to start.<br>Cheap to scale.
         </h2>
         <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
-          The CLI is free forever. AI features are metered fairly. Upgrade or downgrade anytime.
+          The CLI is free forever with unlimited reminders. AI features and Claude Code tools work on every plan. Upgrade when you need more AI suggestions.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid md:grid-cols-3 gap-6 mx-auto" style="align-items: stretch;">
         <!-- Free -->
-        <div class="pricing-card reveal reveal-delay-1">
+        <div class="pricing-card reveal reveal-delay-1" style="display: flex; flex-direction: column;">
           <p class="text-sm font-semibold tracking-widest uppercase mb-6" style="color: var(--text-tertiary); letter-spacing: 0.1em;">Free</p>
           <div class="font-display text-4xl mb-2" style="color: var(--text);">$0</div>
           <p class="text-sm mb-8" style="color: var(--text-tertiary);">forever</p>
           <hr class="rule-dotted mb-8">
-          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5 AI suggestions / month</li>
+          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Basic notifications</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Background scheduler</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> All 7 MCP tools</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5 AI suggestions / month</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Notifications + nudges</li>
           </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/free" class="btn-secondary w-full justify-center">Get Started</a>
+          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/free" class="btn-secondary w-full justify-center" style="margin-top: auto;">Get Started</a>
         </div>
 
-        <!-- Indie (Featured) -->
-        <div class="pricing-card featured reveal reveal-delay-2">
+        <!-- Indie -->
+        <div class="pricing-card featured reveal reveal-delay-2" style="display: flex; flex-direction: column;">
           <div class="flex items-center justify-between mb-6">
             <p class="text-sm font-semibold tracking-widest uppercase" style="color: var(--accent); letter-spacing: 0.1em;">Indie</p>
             <span class="text-xs font-bold tracking-widest uppercase px-3 py-1" style="background: var(--accent); color: white; letter-spacing: 0.1em;">Popular</span>
@@ -952,228 +653,85 @@
           <div class="font-display text-4xl mb-2" style="color: var(--text);">$5<span class="text-lg" style="color: var(--text-tertiary);">/mo</span></div>
           <p class="text-sm mb-8" style="color: var(--text-tertiary);">or $48/year (save 20%)</p>
           <hr class="rule-dotted mb-8">
-          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 100 AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
+          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Everything in Free</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> <strong style="color: var(--text);">100</strong> AI suggestions / month</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority notifications</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Background scheduler</li>
           </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/indie" class="btn-primary w-full justify-center">Start Free Trial</a>
+          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/indie" class="btn-primary w-full justify-center" style="margin-top: auto;">Start Free Trial</a>
         </div>
 
         <!-- Pro -->
-        <div class="pricing-card reveal reveal-delay-3">
+        <div class="pricing-card reveal reveal-delay-3" style="display: flex; flex-direction: column;">
           <p class="text-sm font-semibold tracking-widest uppercase mb-6" style="color: var(--text-tertiary); letter-spacing: 0.1em;">Pro</p>
           <div class="font-display text-4xl mb-2" style="color: var(--text);">$15<span class="text-lg" style="color: var(--text-tertiary);">/mo</span></div>
           <p class="text-sm mb-8" style="color: var(--text-tertiary);">or $144/year (save 20%)</p>
           <hr class="rule-dotted mb-8">
-          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 1,000 AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Advanced notifications</li>
+          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem; flex: 1;">
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Everything in Indie</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> <strong style="color: var(--text);">1,000</strong> AI suggestions / month</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority support</li>
           </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/pro" class="btn-secondary w-full justify-center">Get Pro</a>
-        </div>
-
-        <!-- Team -->
-        <div class="pricing-card reveal reveal-delay-4">
-          <p class="text-sm font-semibold tracking-widest uppercase mb-6" style="color: var(--text-tertiary); letter-spacing: 0.1em;">Team</p>
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">$50<span class="text-lg" style="color: var(--text-tertiary);">/mo</span></div>
-          <p class="text-sm mb-8" style="color: var(--text-tertiary);">or $480/year (save 20%)</p>
-          <hr class="rule-dotted mb-8">
-          <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem;">
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5,000+ AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders (Claude Code)</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority support</li>
-          </ul>
-          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/team" class="btn-secondary w-full justify-center">Get Team</a>
+          <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/pro" class="btn-secondary w-full justify-center" style="margin-top: auto;">Get Pro</a>
         </div>
       </div>
+
+      <p class="text-sm mt-8 reveal" style="color: var(--text-tertiary);">
+        Need more? <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/team" style="color: var(--accent); text-decoration: underline;">Team plan</a> starts at $50/mo with 5,000+ AI suggestions.
+      </p>
     </div>
   </section>
 
   <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
 
-  <!-- ═══════════ TESTIMONIALS ═══════════ -->
-  <section id="testimonials" class="py-24 md:py-32 px-6 lg:px-10">
-    <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-20 reveal">
-        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Voices</p>
-        <h2 class="font-display text-4xl md:text-5xl leading-tight" style="color: var(--text);">
-          What developers<br>are saying.
-        </h2>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-10 md:gap-8">
-        <!-- Testimonial 1 -->
-        <div class="reveal reveal-delay-1">
-          <div class="pull-quote">
-            <p class="font-display text-xl md:text-2xl leading-relaxed mb-8" style="color: var(--text);">
-              "Remind has completely changed how I manage my day. The AI suggestions are scarily accurate."
-            </p>
-            <div>
-              <p class="font-semibold" style="color: var(--text);">Sarah Chen</p>
-              <p class="text-sm" style="color: var(--text-tertiary);">Product Manager, TechCorp</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Testimonial 2 -->
-        <div class="reveal reveal-delay-2">
-          <div class="pull-quote">
-            <p class="font-display text-xl md:text-2xl leading-relaxed mb-8" style="color: var(--text);">
-              "As a CLI-first developer, this is exactly what I've been waiting for. Fast, powerful, zero friction."
-            </p>
-            <div>
-              <p class="font-semibold" style="color: var(--text);">Marcus Rodriguez</p>
-              <p class="text-sm" style="color: var(--text-tertiary);">Senior Engineer, DevStudio</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Testimonial 3 -->
-        <div class="reveal reveal-delay-3">
-          <div class="pull-quote">
-            <p class="font-display text-xl md:text-2xl leading-relaxed mb-8" style="color: var(--text);">
-              "The pricing is fair, the team is responsive, and the product just works. Rare combination."
-            </p>
-            <div>
-              <p class="font-semibold" style="color: var(--text);">Alex Kim</p>
-              <p class="text-sm" style="color: var(--text-tertiary);">Founder, StartupXYZ</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
-
-  <!-- ═══════════ OPEN SOURCE ═══════════ -->
-  <section class="py-24 md:py-32 px-6 lg:px-10">
-    <div class="max-w-7xl mx-auto">
-      <div class="max-w-2xl mb-16 reveal">
-        <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Open Source</p>
-        <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
-          Built in the open.
-        </h2>
-        <p class="text-lg leading-relaxed" style="color: var(--text-secondary);">
-          Remind is fully open source and community-driven. Every feature, bug fix, and decision happens in the open. We believe developer tools should be transparent, auditable, and shaped by the people who use them.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-        <div class="feature-card reveal reveal-delay-1" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">PyPI</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">Published</p>
-        </div>
-        <div class="feature-card reveal reveal-delay-2" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">MCP</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">Server Built-in</p>
-        </div>
-        <div class="feature-card reveal reveal-delay-3" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">6</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">AI Tools</p>
-        </div>
-        <div class="feature-card reveal reveal-delay-4" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">MIT</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">License</p>
-        </div>
-      </div>
-
-      <div class="reveal">
-        <a href="https://github.com/remind-cli/remind" class="btn-secondary" target="_blank" rel="noopener noreferrer">
-          <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View on GitHub
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
-
-  <!-- ═══════════ CTA ═══════════ -->
+  <!-- STAY CONNECTED -->
   <section class="py-24 md:py-32 px-6 lg:px-10">
     <div class="max-w-7xl mx-auto">
       <div class="grid lg:grid-cols-2 gap-16 items-center">
         <div class="reveal">
-          <h2 class="font-display text-4xl md:text-5xl lg:text-6xl leading-tight mb-8" style="color: var(--text);">
-            Start remembering<br>what matters.
+          <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Stay in the Loop</p>
+          <h2 class="font-display text-4xl md:text-5xl leading-tight mb-6" style="color: var(--text);">
+            Not ready to install?
           </h2>
-          <p class="text-lg leading-relaxed mb-10" style="color: var(--text-secondary);">
-            Free forever for basic use. No credit card required. Install in 30 seconds and never miss a deadline again.
+          <p class="text-lg leading-relaxed mb-8" style="color: var(--text-secondary);">
+            Drop your email and we'll send you product updates — new features, Claude Code tips, and the occasional deep dive on building CLI tools. No spam. Unsubscribe anytime.
           </p>
-          <div class="flex flex-wrap gap-4">
-            <a href="#install" class="btn-primary">
-              Install Remind
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <a href="#pricing" class="btn-secondary">View Pricing</a>
-          </div>
         </div>
         <div class="reveal reveal-delay-2">
-          <div class="install-block" style="font-size: 1rem; padding: 1.5rem 2rem;">
-            <div>
-              <div style="margin-bottom: 8px;"><span style="color:#52b788;">$</span> uv tool install remind-cli</div>
-              <div style="margin-bottom: 8px;"><span style="color:#6b645c;"># or</span></div>
-              <div><span style="color:#52b788;">$</span> pip install remind-cli</div>
+          <form id="emailForm" onsubmit="handleEmailSubmit(event)" style="max-width: 440px; margin-left: auto;">
+            <div style="display: flex; gap: 0;">
+              <input type="email" required placeholder="you@example.com" class="email-input" style="border-radius: 0; flex: 1;" id="emailInput">
+              <button type="submit" class="btn-primary" style="border-radius: 0; white-space: nowrap; padding: 0.875rem 1.5rem;" id="emailBtn">Subscribe</button>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
-
-  <!-- ═══════════ CONTACT ═══════════ -->
-  <section id="contact" class="py-24 md:py-32 px-6 lg:px-10">
-    <div class="max-w-7xl mx-auto">
-      <div class="grid lg:grid-cols-2 gap-16">
-        <div class="reveal">
-          <p class="text-sm font-semibold tracking-widest uppercase mb-4" style="color: var(--accent); letter-spacing: 0.15em;">Contact</p>
-          <h2 class="font-display text-4xl md:text-5xl leading-tight mb-8" style="color: var(--text);">
-            Let's talk.
-          </h2>
-          <p class="text-lg leading-relaxed mb-10" style="color: var(--text-secondary);">
-            Have a question, feature request, or just want to say hello? We'd love to hear from you.
-          </p>
-          <div class="space-y-5" style="color: var(--text-secondary);">
-            <div class="flex items-center gap-4">
-              <span class="text-sm font-semibold tracking-widest uppercase" style="color: var(--accent); width: 70px; letter-spacing: 0.08em;">Email</span>
-              <a href="mailto:hello@remind.hamzaplojovic.blog" class="transition-colors" style="color: var(--text);">hello@remind.hamzaplojovic.blog</a>
-            </div>
-            <div class="flex items-center gap-4">
-              <span class="text-sm font-semibold tracking-widest uppercase" style="color: var(--accent); width: 70px; letter-spacing: 0.08em;">Twitter</span>
-              <span style="color: var(--text);">@RemindCLI</span>
-            </div>
-            <div class="flex items-center gap-4">
-              <span class="text-sm font-semibold tracking-widest uppercase" style="color: var(--accent); width: 70px; letter-spacing: 0.08em;">GitHub</span>
-              <span style="color: var(--text);">remind-cli/remind</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="reveal reveal-delay-2">
-          <form class="space-y-5">
-            <div>
-              <label class="text-xs font-semibold tracking-widest uppercase block mb-2" style="color: var(--text-secondary); letter-spacing: 0.1em;">Email</label>
-              <input type="email" placeholder="you@company.com" class="form-input">
-            </div>
-            <div>
-              <label class="text-xs font-semibold tracking-widest uppercase block mb-2" style="color: var(--text-secondary); letter-spacing: 0.1em;">Message</label>
-              <textarea placeholder="What's on your mind?" rows="6" class="form-input" style="resize: none;"></textarea>
-            </div>
-            <button type="submit" class="btn-primary w-full justify-center">Send Message</button>
+            <p id="emailMsg" class="text-sm mt-3" style="color: var(--accent-secondary); display: none;"></p>
+            <p class="text-xs mt-3" style="color: var(--text-tertiary);">We respect your inbox. Typically 1-2 emails per month.</p>
           </form>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════════ FOOTER ═══════════ -->
+  <div class="max-w-7xl mx-auto px-6 lg:px-10"><hr class="rule"></div>
+
+  <!-- FINAL CTA -->
+  <section class="py-24 md:py-32 px-6 lg:px-10">
+    <div class="max-w-7xl mx-auto text-center">
+      <div class="max-w-2xl mx-auto reveal">
+        <h2 class="font-display text-4xl md:text-5xl lg:text-6xl leading-tight mb-8" style="color: var(--text);">
+          Stop forgetting.<br>Start shipping.
+        </h2>
+        <p class="text-lg leading-relaxed mb-10" style="color: var(--text-secondary);">
+          Free forever. No credit card. Install in 30 seconds.
+        </p>
+        <div class="install-block max-w-md mx-auto">
+          <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer style="border-top: 1px solid var(--border); transition: border-color 0.5s ease;">
     <div class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
       <div class="grid md:grid-cols-4 gap-12 mb-16">
@@ -1186,17 +744,16 @@
           <ul class="space-y-3">
             <li><a href="#features" class="text-sm transition-colors" style="color: var(--text-tertiary);">Features</a></li>
             <li><a href="#pricing" class="text-sm transition-colors" style="color: var(--text-tertiary);">Pricing</a></li>
-            <li><a href="changelog.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Changelog</a></li>
-            <li><a href="docs/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Documentation</a></li>
-            <li><a href="integrations.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Integrations</a></li>
+            <li><a href="integrations.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Claude Code</a></li>
+            <li><a href="compare.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Compare</a></li>
           </ul>
         </div>
         <div>
-          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Company</p>
+          <p class="text-xs font-semibold tracking-widest uppercase mb-5" style="color: var(--text-secondary); letter-spacing: 0.1em;">Resources</p>
           <ul class="space-y-3">
+            <li><a href="docs/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Documentation</a></li>
             <li><a href="blog/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Blog</a></li>
-            <li><a href="#contact" class="text-sm transition-colors" style="color: var(--text-tertiary);">Contact</a></li>
-            <li><a href="status.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Status</a></li>
+            <li><a href="changelog.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Changelog</a></li>
           </ul>
         </div>
         <div>
@@ -1217,87 +774,88 @@
     </div>
   </footer>
 
-  <!-- ═══════════ SCRIPTS ═══════════ -->
+  <!-- SCRIPTS -->
   <script>
-    // ——— Install Tab Switcher ———
+    // Install Tab Switcher
     function switchInstallTab(btn, targetId) {
       document.querySelectorAll('.install-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('#tab-uv, #tab-pip, #tab-curl').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('#tab-uv, #tab-pip').forEach(p => p.style.display = 'none');
       document.getElementById(targetId).style.display = 'flex';
     }
 
-    // ——— Theme Toggle ———
+    // Theme Toggle
     const toggle = document.getElementById('themeToggle');
     const html = document.documentElement;
     const saved = localStorage.getItem('theme');
-
-    // Default to light; respect saved preference or system preference
     if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       html.classList.add('dark');
     }
-
     toggle.addEventListener('click', () => {
       html.classList.toggle('dark');
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    // ——— Scroll Reveal ———
+    // Mobile Nav
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    });
+
+    // Scroll Reveal
     const revealEls = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-
     revealEls.forEach(el => revealObserver.observe(el));
 
-    // ——— Interactive Terminal Demo ———
+    // Interactive Terminal — Claude Code conversations
     (function() {
       const content = document.getElementById('terminalContent');
       const typing = document.getElementById('terminalTyping');
-      const cursor = document.getElementById('terminalCursor');
 
       const sequences = [
         {
-          command: 'remind add "deploy by friday"',
+          command: 'Remind me to deploy v2 on Friday at 3pm',
           output: [
-            { html: '<span class="term-output">AI enhanced:</span> <span class="term-highlight">Deploy by Friday, 5:00 PM</span>', delay: 400 },
-            { html: '<span class="term-output">Priority:</span> <span style="color: #f0c674;">High</span> <span class="term-output" style="margin-left: 1rem;">Due:</span> <span style="color: #52b788;">Fri, 5:00 PM</span>', delay: 200 },
-            { html: '<span style="color: #52b788;">\u2713</span> <span class="term-output">Reminder saved (#5)</span>', delay: 200 },
+            { html: '<span class="term-flag">Claude:</span> <span style="color:#52b788;">&#10003;</span> <span class="term-cmd">Reminder #15 saved.</span>', delay: 400 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Text: Deploy v2</span>', delay: 150 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Due: Friday, 3:00 PM</span>', delay: 150 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Priority: medium</span>', delay: 150 },
           ]
         },
         {
-          command: 'remind list',
+          command: 'What reminders do I have?',
           output: [
-            { html: '<span class="term-output"> 1</span>  <span style="color: #f0c674;">Review PR #234</span> <span class="term-output">\u00b7 today 5pm</span>', delay: 150 },
-            { html: '<span class="term-output"> 2</span>  <span style="color: #f0ebe4;">Buy groceries</span> <span class="term-output">\u00b7 tonight</span>', delay: 150 },
-            { html: '<span class="term-output"> 3</span>  <span style="color: #f0ebe4;">Ship v2.0 release</span> <span class="term-output">\u00b7 Friday</span>', delay: 150 },
-            { html: '<span class="term-highlight"> 5</span>  <span style="color: #f0ebe4;">Deploy by Friday</span> <span class="term-output">\u00b7 Fri, 5pm</span>', delay: 150 },
+            { html: '<span class="term-flag">Claude:</span> <span class="term-output">You have 3 reminders:</span>', delay: 300 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#12 [HIGH] Fix auth bug — Wed 9am</span>', delay: 150 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#14 [MED] Review PR #89 — Thu 2pm</span>', delay: 150 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">#15 [MED] Deploy v2 — Fri 3pm</span>', delay: 150 },
           ]
         },
         {
-          command: 'remind done 1',
+          command: 'Mark #12 as done',
           output: [
-            { html: '<span style="color: #52b788;">\u2713</span> <span class="term-output">Completed:</span> <span style="color: #f0c674; text-decoration: line-through;">Review PR #234</span>', delay: 400 },
-            { html: '<span class="term-output">3 reminders remaining</span>', delay: 200 },
+            { html: '<span class="term-flag">Claude:</span> <span style="color:#52b788;">&#10003;</span> <span class="term-output">Completed:</span> <span style="color: #f0c674; text-decoration: line-through;">Fix auth bug</span>', delay: 400 },
+            { html: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">2 reminders remaining.</span>', delay: 200 },
           ]
         }
       ];
 
       let seqIndex = 0;
 
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
+      function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
       async function typeCommand(text) {
         typing.textContent = '';
         for (let i = 0; i < text.length; i++) {
           typing.textContent += text[i];
-          await sleep(40);
+          await sleep(35);
         }
       }
 
@@ -1306,30 +864,27 @@
           await sleep(line.delay);
           const div = document.createElement('div');
           div.className = 'term-line';
-          div.style.paddingLeft = '1rem';
-          div.style.marginTop = '4px';
           div.innerHTML = line.html;
           content.appendChild(div);
         }
       }
 
       async function runSequence(seq) {
-        // Type the command
         await typeCommand(seq.command);
         await sleep(300);
 
-        // Move typed command into content area as a completed line
         const cmdLine = document.createElement('div');
         cmdLine.className = 'term-line';
-        cmdLine.innerHTML = '<span class="term-prompt">~</span> <span class="term-cmd">' + seq.command + '</span>';
+        cmdLine.innerHTML = '<span class="term-flag">You:</span> <span class="term-string">"' + seq.command + '"</span>';
         content.appendChild(cmdLine);
         typing.textContent = '';
 
-        // Show output lines
-        await showOutput(seq.output);
+        const spacer = document.createElement('div');
+        spacer.style.height = '8px';
+        content.appendChild(spacer);
 
-        // Pause to let user read
-        await sleep(2000);
+        await showOutput(seq.output);
+        await sleep(2500);
       }
 
       async function runLoop() {
@@ -1338,12 +893,10 @@
           await runSequence(seq);
           seqIndex = (seqIndex + 1) % sequences.length;
 
-          // If looping back to start, clear and add separator
           if (seqIndex === 0) {
             await sleep(500);
             content.innerHTML = '';
           } else {
-            // Add separator between sequences
             const sep = document.createElement('div');
             sep.style.borderTop = '1px solid #2a2724';
             sep.style.margin = '12px 0';
@@ -1352,17 +905,36 @@
         }
       }
 
-      // Start after a small delay to let the page load
       setTimeout(runLoop, 800);
     })();
 
-    // ——— Smooth Scroll ———
+    // Email Form
+    function handleEmailSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('emailInput');
+      const msg = document.getElementById('emailMsg');
+      const btn = document.getElementById('emailBtn');
+
+      // Store locally for now — hook up to your backend later
+      const email = input.value;
+      console.log('Newsletter signup:', email);
+
+      btn.textContent = 'Subscribed';
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      input.disabled = true;
+      msg.textContent = 'Thanks! We\'ll keep you posted.';
+      msg.style.display = 'block';
+    }
+
+    // Smooth Scroll
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
         const target = document.querySelector(a.getAttribute('href'));
         if (target) {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          mobileMenu.classList.remove('open');
         }
       });
     });

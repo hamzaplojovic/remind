@@ -16,7 +16,7 @@
       <div class="top-nav-links">
         <a href="index.html" class="active">Docs</a>
         <a href="../index.html#pricing">Pricing</a>
-        <a href="../index.html#contact">Contact</a>
+        <a href="https://github.com/hamzaplojovic/remind">GitHub</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
       </div>
     </div>
@@ -40,8 +40,11 @@
         <a href="#settings" class="sidebar-link sub">settings</a>
         <a href="#scheduler" class="sidebar-link sub">scheduler</a>
         <a href="#doctor" class="sidebar-link sub">doctor</a>
-        <a href="#report" class="sidebar-link sub">report</a>
+        <a href="#usage" class="sidebar-link sub">usage</a>
+        <a href="#register" class="sidebar-link sub">register</a>
         <a href="#upgrade" class="sidebar-link sub">upgrade</a>
+        <a href="#update" class="sidebar-link sub">update</a>
+        <a href="#mcp" class="sidebar-link sub">mcp</a>
         <a href="#uninstall" class="sidebar-link sub">uninstall</a>
       </div>
       <div class="sidebar-section">
@@ -231,17 +234,15 @@
       <!-- ═══════════ SCHEDULER ═══════════ -->
       <h2 id="scheduler">remind scheduler</h2>
 
-      <p>Manage the background notification service. Requires Indie plan or higher.</p>
+      <p>Run the background notification service. Uses LaunchAgent on macOS, systemd on Linux.</p>
 
-<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> [OPTIONS]</code></pre>
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> <span class="term-flag">--run</span></code></pre>
 
       <h4>Options</h4>
       <table>
         <thead><tr><th>Flag</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>--status</code></td><td>Show current scheduler status</td></tr>
-          <tr><td><code>--enable</code></td><td>Start background notification service</td></tr>
-          <tr><td><code>--disable</code></td><td>Stop background notification service</td></tr>
+          <tr><td><code>--run</code></td><td>Start the background scheduler process</td></tr>
         </tbody>
       </table>
 
@@ -271,29 +272,68 @@
 
       <hr>
 
-      <!-- ═══════════ REPORT ═══════════ -->
-      <h2 id="report">remind report</h2>
+      <!-- ═══════════ USAGE ═══════════ -->
+      <h2 id="usage">remind usage</h2>
 
-      <p>Show usage statistics and productivity insights. Requires authentication.</p>
+      <p>Show usage statistics — total reminders, completed, overdue, AI quota used, and plan tier.</p>
 
-<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind report</span> [OPTIONS]</code></pre>
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind usage</span></code></pre>
 
-      <h4>Options</h4>
-      <table>
-        <thead><tr><th>Flag</th><th>Short</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>--format</code></td><td><code>-f</code></td><td>Output format: <code>table</code> (default) or <code>json</code></td></tr>
-        </tbody>
-      </table>
+      <h4>Example</h4>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind usage</span>
+  <span class="term-output">Total          47</span>
+  <span class="term-output">Done this month 23</span>
+  <span class="term-output">Overdue         2</span>
+  <span class="term-output">AI used         18 / 100</span>
+  <span class="term-output">Plan            Indie</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ REGISTER ═══════════ -->
+      <h2 id="register">remind register</h2>
+
+      <p>Register for a paid plan. Opens a Polar checkout in your browser.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind register</span></code></pre>
 
       <hr>
 
       <!-- ═══════════ UPGRADE ═══════════ -->
       <h2 id="upgrade">remind upgrade</h2>
 
-      <p>View available plans and your current tier. Directs you to the web dashboard to manage billing.</p>
+      <p>View available plans and your current tier. Opens checkout to upgrade.</p>
 
 <pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind upgrade</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ UPDATE ═══════════ -->
+      <h2 id="update">remind update</h2>
+
+      <p>Self-update the CLI to the latest version from PyPI.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind update</span></code></pre>
+
+      <hr>
+
+      <!-- ═══════════ MCP ═══════════ -->
+      <h2 id="mcp">remind mcp</h2>
+
+      <p>Start the MCP (Model Context Protocol) server for Claude Code integration. Exposes 7 tools: add, list, complete, search, update, delete reminders, and schedule agent tasks.</p>
+
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind mcp</span></code></pre>
+
+      <p>To configure in Claude Code, add to <code>.claude/settings.json</code>:</p>
+
+<pre><code>{
+  <span class="term-string">"mcpServers"</span>: {
+    <span class="term-string">"remind"</span>: {
+      <span class="term-string">"command"</span>: <span class="term-string">"remind"</span>,
+      <span class="term-string">"args"</span>: [<span class="term-string">"mcp"</span>]
+    }
+  }
+}</code></pre>
 
       <hr>
 
@@ -331,7 +371,7 @@
     </main>
   </div>
 
-  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+  <footer class="doc-footer">&copy; 2026 Remind. All rights reserved.</footer>
 
   <script>
     const toggle = document.getElementById('themeToggle');

@@ -221,7 +221,7 @@
       <li>Reminder text is sent over an encrypted (TLS 1.3) connection.</li>
       <li>Neither we nor our AI provider permanently store the reminder text. It is processed in memory and discarded.</li>
       <li>AI providers are contractually prohibited from using your data to train models.</li>
-      <li>You can disable AI features entirely by running <code>remind config set ai.enabled false</code>. When disabled, zero data is sent to external services.</li>
+      <li>You can disable AI features entirely by running <code>remind settings --set ai_rephrasing_enabled=false</code>. When disabled, zero data is sent to external services.</li>
     </ul>
 
     <h2>Third Parties</h2>
@@ -246,8 +246,8 @@
     <ul>
       <li><strong>Access</strong> the personal data we hold about you.</li>
       <li><strong>Delete</strong> your account and all associated data.</li>
-      <li><strong>Export</strong> your data. Run <code>remind export</code> to get a full JSON dump of your local database at any time.</li>
-      <li><strong>Opt out</strong> of analytics collection by running <code>remind config set analytics.enabled false</code>.</li>
+      <li><strong>Export</strong> your data. Your reminders are stored in a local SQLite file at <code>~/.remind/remind.db</code> — you can query it directly at any time.</li>
+      <li><strong>Opt out</strong> of analytics collection by running <code>remind settings --set analytics_enabled=false</code>.</li>
       <li><strong>Restrict processing</strong> by disabling AI features.</li>
     </ul>
     <p>To exercise any of these rights, email us at <a href="mailto:privacy@remind.hamzaplojovic.blog">privacy@remind.hamzaplojovic.blog</a>. We respond within 15 business days.</p>
@@ -262,7 +262,7 @@
     <p>If you have questions about this privacy policy or how your data is handled:</p>
     <ul>
       <li>Email: <a href="mailto:privacy@remind.hamzaplojovic.blog">privacy@remind.hamzaplojovic.blog</a></li>
-      <li>GitHub: <a href="https://github.com/remind-cli/remind">remind-cli/remind</a></li>
+      <li>GitHub: <a href="https://github.com/hamzaplojovic/remind">hamzaplojovic/remind</a></li>
       <li>Twitter: <a href="https://twitter.com/RemindCLI">@RemindCLI</a></li>
     </ul>
   </main>
@@ -270,7 +270,7 @@
   <!-- FOOTER -->
   <footer>
     <div style="max-width:780px;margin:0 auto;padding:2rem;text-align:center;">
-      <p style="font-size:0.85rem;color:var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+      <p style="font-size:0.85rem;color:var(--text-tertiary);">&copy; 2026 Remind. All rights reserved.</p>
     </div>
   </footer>
 

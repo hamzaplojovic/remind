@@ -372,7 +372,7 @@
           <a href="docs/index.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Docs</a>
           <a href="index.html#pricing" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Pricing</a>
           <a href="compare.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--accent); letter-spacing: 0.08em;">Compare</a>
-          <a href="integrations.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Integrations</a>
+          <a href="changelog.html" class="text-sm font-medium tracking-wide uppercase transition-colors" style="color: var(--text-secondary); letter-spacing: 0.08em;">Changelog</a>
         </div>
         <div class="flex items-center gap-5">
           <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
@@ -457,7 +457,7 @@
             </tr>
             <tr>
               <td>Cross-platform</td>
-              <td class="highlight"><span class="check">&#10003;</span></td>
+              <td class="highlight"><span class="partial">macOS + Linux</span></td>
               <td><span class="partial">Apple only</span></td>
               <td><span class="check">&#10003;</span></td>
               <td><span class="check">&#10003;</span></td>
@@ -544,7 +544,7 @@
           <div style="font-family: 'Young Serif', serif; font-size: 3rem; color: var(--border); line-height: 1; margin-bottom: 1rem; transition: color 0.4s ease;">03</div>
           <h3 class="font-display text-2xl mb-4" style="color: var(--text);">Lightweight</h3>
           <p style="color: var(--text-secondary); line-height: 1.7;">
-            No Electron. No browser. No Java runtime. Remind is a single binary that starts in milliseconds and uses negligible memory. It installs via Homebrew, pip, or a direct download. Your laptop battery will thank you.
+            No Electron. No browser. No Java runtime. Remind is a Python CLI that starts in milliseconds and uses negligible memory. It installs via uv, pip, or a direct download. Your laptop battery will thank you.
           </p>
         </div>
 
@@ -580,8 +580,8 @@
           <a href="index.html#pricing" class="btn-secondary">View Pricing</a>
         </div>
         <div class="install-block max-w-md mx-auto">
-          <code><span style="color:#52b788;">$</span> brew install remind-cli</code>
-          <button class="copy-btn" onclick="navigator.clipboard.writeText('brew install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+          <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
         </div>
       </div>
     </div>
@@ -601,7 +601,7 @@
             <li><a href="index.html#features" class="text-sm transition-colors" style="color: var(--text-tertiary);">Features</a></li>
             <li><a href="index.html#pricing" class="text-sm transition-colors" style="color: var(--text-tertiary);">Pricing</a></li>
             <li><a href="compare.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Compare</a></li>
-            <li><a href="integrations.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Integrations</a></li>
+            <li><a href="changelog.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Changelog</a></li>
           </ul>
         </div>
         <div>
@@ -609,7 +609,7 @@
           <ul class="space-y-3">
             <li><a href="docs/index.html" class="text-sm transition-colors" style="color: var(--text-tertiary);">Documentation</a></li>
             <li><a href="blog/" class="text-sm transition-colors" style="color: var(--text-tertiary);">Blog</a></li>
-            <li><a href="index.html#contact" class="text-sm transition-colors" style="color: var(--text-tertiary);">Contact</a></li>
+            <li><a href="https://github.com/hamzaplojovic/remind" class="text-sm transition-colors" style="color: var(--text-tertiary);">GitHub</a></li>
           </ul>
         </div>
         <div>
@@ -624,7 +624,7 @@
       <hr class="rule mb-8">
 
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2026 Remind. All rights reserved.</p>
         <p class="text-sm" style="color: var(--text-tertiary);">Built with care for the terminal.</p>
       </div>
     </div>

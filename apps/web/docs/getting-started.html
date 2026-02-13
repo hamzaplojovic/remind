@@ -16,7 +16,7 @@
       <div class="top-nav-links">
         <a href="index.html" class="active">Docs</a>
         <a href="../index.html#pricing">Pricing</a>
-        <a href="../index.html#contact">Contact</a>
+        <a href="https://github.com/hamzaplojovic/remind">GitHub</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
       </div>
     </div>
@@ -64,17 +64,17 @@
 
       <ul>
         <li><strong>Python 3.12+</strong> (if installing via pip)</li>
-        <li><strong>macOS, Linux, or Windows</strong></li>
+        <li><strong>macOS or Linux</strong></li>
         <li>Internet connection for AI features (optional)</li>
       </ul>
 
       <h2>Installation</h2>
 
-      <h3>Homebrew (macOS &amp; Linux)</h3>
+      <h3>uv (recommended)</h3>
 
-      <p>The recommended way to install on macOS and Linux:</p>
+      <p>The fastest way to install — isolated tool environment, no dependency conflicts:</p>
 
-<pre><code><span class="term-prompt">$</span> <span class="term-cmd">brew install remind-cli</span></code></pre>
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">uv tool install remind-cli</span></code></pre>
 
       <h3>pip</h3>
 
@@ -161,14 +161,29 @@
 
       <h2>Optional: Enable background notifications</h2>
 
-<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> <span class="term-flag">--enable</span>
-  <span class="term-success">✓</span> <span class="term-output">Scheduler enabled</span>
-  <span class="term-output">Will check reminders every 5 minutes</span></code></pre>
+<pre><code><span class="term-prompt">$</span> <span class="term-cmd">remind scheduler</span> <span class="term-flag">--run</span>
+  <span class="term-success">✓</span> <span class="term-output">Scheduler started</span>
+  <span class="term-output">Checking every 1s</span></code></pre>
 
       <div class="callout">
         <div class="callout-label">Note</div>
-        <p>The scheduler requires the Indie plan or higher. It runs as a background process and delivers native OS notifications.</p>
+        <p>The scheduler runs as a background process and delivers native OS notifications on macOS (AppleScript) and Linux (D-Bus).</p>
       </div>
+
+      <h2>Optional: Claude Code integration</h2>
+
+      <p>Remind includes an MCP server with 7 tools for Claude Code. Add it to your <code>.claude/settings.json</code>:</p>
+
+<pre><code>{
+  <span class="term-string">"mcpServers"</span>: {
+    <span class="term-string">"remind"</span>: {
+      <span class="term-string">"command"</span>: <span class="term-string">"remind"</span>,
+      <span class="term-string">"args"</span>: [<span class="term-string">"mcp"</span>]
+    }
+  }
+}</code></pre>
+
+      <p>Claude Code can then add, list, complete, search, update, and delete reminders — or schedule autonomous agent tasks.</p>
 
       <!-- Prev/Next -->
       <div class="doc-nav">
@@ -184,7 +199,7 @@
     </main>
   </div>
 
-  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+  <footer class="doc-footer">&copy; 2026 Remind. All rights reserved.</footer>
 
   <script>
     const toggle = document.getElementById('themeToggle');

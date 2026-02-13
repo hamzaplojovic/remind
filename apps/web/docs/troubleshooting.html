@@ -16,7 +16,7 @@
       <div class="top-nav-links">
         <a href="index.html" class="active">Docs</a>
         <a href="../index.html#pricing">Pricing</a>
-        <a href="../index.html#contact">Contact</a>
+        <a href="https://github.com/hamzaplojovic/remind">GitHub</a>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"></button>
       </div>
     </div>
@@ -83,7 +83,7 @@
 
       <p><strong>Fix:</strong></p>
       <ul>
-        <li>If installed via Homebrew: run <code>brew link remind</code></li>
+        <li>If installed via uv: run <code>uv tool install remind-cli</code> again</li>
         <li>If installed via pip: ensure your Python scripts directory is in PATH</li>
         <li>Check with: <code>which remind</code> or <code>pip show remind-cli</code></li>
       </ul>
@@ -128,7 +128,7 @@
       <p><strong>Fix:</strong></p>
       <ul>
         <li>Check your internet connection</li>
-        <li>Verify quota with <code>remind report</code></li>
+        <li>Verify quota with <code>remind usage</code></li>
         <li>Check if using a custom backend URL: <code>remind settings --view</code></li>
         <li>Reminders are still created without AI — use <code>--no-ai</code> as a workaround</li>
       </ul>
@@ -160,12 +160,10 @@
 
       <p><strong>Fix:</strong></p>
       <ol>
-        <li>Check scheduler status: <code>remind scheduler --status</code></li>
-        <li>Enable if not running: <code>remind scheduler --enable</code></li>
+        <li>Start the scheduler: <code>remind scheduler --run</code></li>
         <li>Verify notifications are enabled in settings: <code>remind settings --view</code></li>
         <li><strong>macOS:</strong> Check System Settings &gt; Notifications &gt; Remind</li>
         <li><strong>Linux:</strong> Ensure <code>notify-send</code> is installed</li>
-        <li><strong>Windows:</strong> Check notification center settings</li>
       </ol>
 
       <hr>
@@ -199,6 +197,31 @@
 
       <hr>
 
+      <h2>MCP server issues</h2>
+
+      <h3>"MCP server not connecting"</h3>
+
+      <p>Claude Code can't reach the Remind MCP server.</p>
+
+      <p><strong>Fix:</strong></p>
+      <ul>
+        <li>Verify <code>remind mcp</code> runs without errors: <code>remind mcp</code></li>
+        <li>Check your <code>.claude/settings.json</code> has the correct config:
+<pre><code>{
+  <span class="term-string">"mcpServers"</span>: {
+    <span class="term-string">"remind"</span>: {
+      <span class="term-string">"command"</span>: <span class="term-string">"remind"</span>,
+      <span class="term-string">"args"</span>: [<span class="term-string">"mcp"</span>]
+    }
+  }
+}</code></pre>
+        </li>
+        <li>Ensure <code>remind</code> is in your PATH (test with <code>which remind</code>)</li>
+        <li>Restart Claude Code after changing settings</li>
+      </ul>
+
+      <hr>
+
       <h2>Getting help</h2>
 
       <p>If none of the above resolves your issue:</p>
@@ -225,7 +248,7 @@
     </main>
   </div>
 
-  <footer class="doc-footer">&copy; 2025 Remind. All rights reserved.</footer>
+  <footer class="doc-footer">&copy; 2026 Remind. All rights reserved.</footer>
 
   <script>
     const toggle = document.getElementById('themeToggle');
