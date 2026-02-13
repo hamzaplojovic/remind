@@ -27,11 +27,16 @@ def _detect_install_method() -> str:
         except Exception:
             pass
 
-    # Check if running from a pip/uv installed package
+    # Check if running from a uv tool install (uvx)
     remind_bin = shutil.which("remind")
     if remind_bin:
         resolved = os.path.realpath(remind_bin)
-        # pip installs land in site-packages or a venv bin/
+        if "/uv/tools/" in resolved or "/.local/share/uv/" in resolved:
+            return "uv"
+
+    # Check if running from a pip installed package
+    if remind_bin:
+        resolved = os.path.realpath(remind_bin)
         if "site-packages" in resolved or "/.venv/" in resolved or "/venv/" in resolved:
             return "pip"
 
@@ -77,6 +82,20 @@ def update() -> None:
             output.success("Updated successfully.")
         except subprocess.CalledProcessError:
             output.error("Homebrew update failed. Try: brew upgrade remind")
+            raise typer.Exit(1)
+
+    elif method == "uv":
+        output.info("Updating via uv...")
+        output.blank()
+        try:
+            subprocess.run(
+                ["uv", "tool", "upgrade", "remind-cli"],
+                check=True,
+            )
+            output.blank()
+            output.success("Updated successfully.")
+        except subprocess.CalledProcessError:
+            output.error("uv update failed. Try: uv tool upgrade remind-cli")
             raise typer.Exit(1)
 
     elif method == "pip":
