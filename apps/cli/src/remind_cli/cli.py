@@ -11,6 +11,7 @@ from remind_cli.commands.login import login
 from remind_cli.commands.settings import settings
 from remind_cli.commands.doctor import doctor
 from remind_cli.commands.usage import usage
+from remind_cli.commands.register import register
 from remind_cli.commands.upgrade import upgrade
 from remind_cli.commands.update import update
 from remind_cli.commands.uninstall import uninstall
@@ -73,6 +74,7 @@ def main(
         output.blank()
         output.console.print("  [header.label]MORE COMMANDS[/header.label]")
         output.blank()
+        output.command_row("remind register", "Sign up for a plan")
         output.command_row("remind login <token>", "Authenticate")
         output.command_row("remind settings", "View settings")
         output.command_row("remind doctor", "Diagnose issues")
@@ -94,6 +96,7 @@ app.command()(login)
 app.command()(settings)
 app.command()(doctor)
 app.command()(usage)
+app.command()(register)
 app.command()(upgrade)
 app.command()(update)
 app.command()(uninstall)

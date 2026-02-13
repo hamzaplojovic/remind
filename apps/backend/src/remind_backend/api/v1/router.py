@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from remind_backend.api.v1.endpoints import ai, health, usage
+from remind_backend.api.v1.endpoints import ai, checkout, health, usage
 
 api_router = APIRouter()
 
@@ -15,5 +15,5 @@ api_router.include_router(ai.router, prefix="/suggest-reminder", tags=["ai"])
 # Usage stats endpoint
 api_router.include_router(usage.router, prefix="/usage", tags=["usage"])
 
-# Webhook endpoints (separate from v1)
-# Note: Webhooks are at /webhooks/, not /api/v1/webhooks/
+# Checkout endpoint (creates Polar checkout sessions)
+api_router.include_router(checkout.router, prefix="/checkout", tags=["checkout"])

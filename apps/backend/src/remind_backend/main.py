@@ -49,6 +49,11 @@ def create_app() -> FastAPI:
 
     app.include_router(api_router, prefix="/api/v1")
 
+    # Webhook endpoints (outside /api/v1)
+    from remind_backend.api.webhooks import router as webhooks_router
+
+    app.include_router(webhooks_router, prefix="/webhooks", tags=["webhooks"])
+
     @app.get("/health")
     def health():
         """Health check endpoint."""

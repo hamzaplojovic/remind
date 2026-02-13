@@ -20,6 +20,7 @@ dependencies = [
     "pydantic",
     "pydantic-settings",
     "structlog",
+    "httpx",
     "remind-shared",
     "remind-database",
 ]
