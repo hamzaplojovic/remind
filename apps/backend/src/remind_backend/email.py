@@ -1,25 +1,25 @@
-"""Email service for sending license tokens to customers."""
+"""Email service for sending license tokens to customers via Resend."""
 
 import logging
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
+import httpx
 
 from remind_backend.config import get_settings
 
 logger = logging.getLogger(__name__)
 
+RESEND_API_URL = "https://api.resend.com/emails"
+
 
 def send_license_email(to_email: str, token: str, plan_tier: str) -> bool:
-    """Send license token to customer via SMTP. Returns True on success."""
+    """Send license token to customer via Resend. Returns True on success."""
     settings = get_settings()
 
-    if not settings.smtp_user:
-        logger.warning("SMTP not configured — printing token to console instead")
+    if not settings.resend_api_key:
+        logger.warning("Resend API key not configured — printing token to console instead")
         logger.info("LICENSE TOKEN for %s (%s): %s", to_email, plan_tier, token)
         return True
 
-    subject = f"Your Remind {plan_tier.capitalize()} License"
     html_body = f"""\
 <html>
 <body style="font-family: 'Manrope', system-ui, sans-serif; color: #1a1715; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
@@ -48,27 +48,27 @@ def send_license_email(to_email: str, token: str, plan_tier: str) -> bool:
 </body>
 </html>"""
 
-    text_body = (
-        f"Welcome to Remind {plan_tier.capitalize()}!\n\n"
-        f"Your license token: {token}\n\n"
-        f"To activate, run:\n  remind login {token}\n\n"
-        f"Keep this token safe."
-    )
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = settings.smtp_from_email or settings.smtp_user
-    msg["To"] = to_email
-    msg.attach(MIMEText(text_body, "plain"))
-    msg.attach(MIMEText(html_body, "html"))
-
     try:
-        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-            server.starttls()
-            server.login(settings.smtp_user, settings.smtp_password)
-            server.sendmail(msg["From"], [to_email], msg.as_string())
-        logger.info("License email sent to %s", to_email)
-        return True
+        response = httpx.post(
+            RESEND_API_URL,
+            headers={
+                "Authorization": f"Bearer {settings.resend_api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": settings.email_from,
+                "to": [to_email],
+                "subject": f"Your Remind {plan_tier.capitalize()} License",
+                "html": html_body,
+            },
+            timeout=10,
+        )
+        if response.status_code == 200:
+            logger.info("License email sent to %s via Resend", to_email)
+            return True
+        else:
+            logger.error("Resend API error %d: %s", response.status_code, response.text)
+            return False
     except Exception:
         logger.exception("Failed to send license email to %s", to_email)
         return False

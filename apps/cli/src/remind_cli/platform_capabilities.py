@@ -42,15 +42,19 @@ class PlatformCapabilities:
                 )
                 return result.returncode == 0
             elif player == "paplay":
-                # paplay --version should work
                 result = subprocess.run(
                     [player, "--version"],
                     capture_output=True,
                     timeout=2,
                 )
                 return result.returncode == 0
+            elif player == "simpleaudio":
+                try:
+                    import simpleaudio  # noqa: F401
+                    return True
+                except ImportError:
+                    return False
             else:
-                # For unknown players, just check if they're in PATH
                 return True
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False

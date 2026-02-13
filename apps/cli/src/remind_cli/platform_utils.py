@@ -67,12 +67,12 @@ class PlatformProvider:
         """Get available sound player command.
 
         Returns:
-            Command name (afplay, paplay, etc.)
+            Command name (afplay, simpleaudio, etc.)
         """
         if self.is_macos:
             return "afplay"
         elif self.is_linux:
-            return "paplay"
+            return "simpleaudio"
         elif self.is_windows:
             return "powershell"
         else:

@@ -42,12 +42,9 @@ class Settings(BaseSettings):
     polar_product_pro: str = os.getenv("POLAR_PRODUCT_PRO", "")
     polar_product_team: str = os.getenv("POLAR_PRODUCT_TEAM", "")
 
-    # Email (SMTP)
-    smtp_host: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
-    smtp_port: int = int(os.getenv("SMTP_PORT", "587"))
-    smtp_user: str = os.getenv("SMTP_USER", "")
-    smtp_password: str = os.getenv("SMTP_PASSWORD", "")
-    smtp_from_email: str = os.getenv("SMTP_FROM_EMAIL", "")
+    # Email (Resend)
+    resend_api_key: str = os.getenv("RESEND_API_KEY", "")
+    email_from: str = os.getenv("EMAIL_FROM", "onboarding@resend.dev")
 
     # Rate limiting
     rate_limit_requests: int = int(os.getenv("RATE_LIMIT_REQUESTS", "10"))
