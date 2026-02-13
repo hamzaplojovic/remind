@@ -351,11 +351,101 @@
   <!-- INTEGRATIONS -->
   <div class="max-w-7xl mx-auto px-6 lg:px-10">
 
-    <!-- 1. Shell Aliases -->
-    <div class="integration-section reveal" id="shell-aliases">
+    <!-- 1. Claude Code -->
+    <div class="integration-section reveal" id="claude-code">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
           <div class="integration-number">01</div>
+          <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Claude Code</h2>
+          <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
+            Remind ships as an MCP server. Claude Code can create, manage, and complete your reminders -- right inside your coding session. Plus, schedule autonomous agent tasks that Claude executes on a timer.
+          </p>
+          <p class="text-sm mb-6" style="color: var(--text-tertiary);">
+            One line in your Claude config and you are ready to go.
+          </p>
+        </div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">MCP Setup</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment"># Add to ~/.claude/claude_desktop_config.json</span></div>
+            <div><span class="term-output">{</span></div>
+            <div>&nbsp;&nbsp;<span class="term-string">"mcpServers"</span><span class="term-output">: {</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-string">"remind"</span><span class="term-output">: {</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-string">"command"</span><span class="term-output">:</span> <span class="term-string">"remind"</span><span class="term-output">,</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-string">"args"</span><span class="term-output">:</span> <span class="term-output">[</span><span class="term-string">"mcp"</span><span class="term-output">]</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">}</span></div>
+            <div>&nbsp;&nbsp;<span class="term-output">}</span></div>
+            <div><span class="term-output">}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversation example -->
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mt-12">
+        <div></div>
+        <div class="terminal-block">
+          <div class="terminal-bar">
+            <div class="terminal-dot" style="background: #ff5f57;"></div>
+            <div class="terminal-dot" style="background: #febc2e;"></div>
+            <div class="terminal-dot" style="background: #28c840;"></div>
+            <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">Claude Code session</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-flag">You:</span> <span class="term-string">"Remind me to review the PR tomorrow at 9am"</span></div>
+            <div>&nbsp;</div>
+            <div><span class="term-flag">Claude:</span> <span class="term-cmd">&#10003; Reminder #15 saved.</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Text: Review the PR</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Due: Tomorrow, 9:00 AM</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Priority: medium</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Reminders -->
+      <div class="mt-12">
+        <h3 class="font-display text-2xl mb-4" style="color: var(--text);">Agent Reminders</h3>
+        <!-- Warning Banner -->
+        <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+          <span style="color: #f59e0b; font-size: 1.25rem; line-height: 1.4; flex-shrink: 0;">&#9888;</span>
+          <p style="color: var(--text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+            <strong>WARNING</strong> &mdash; Agent reminders execute Claude Code with <code class="font-mono text-sm" style="color: var(--accent);">--dangerously-skip-permissions</code>. This gives Claude full read/write/execute access to your project. Only use in trusted environments.
+          </p>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          <div></div>
+          <div class="terminal-block">
+            <div class="terminal-bar">
+              <div class="terminal-dot" style="background: #ff5f57;"></div>
+              <div class="terminal-dot" style="background: #febc2e;"></div>
+              <div class="terminal-dot" style="background: #28c840;"></div>
+              <span style="color: #6b645c; font-family: 'Manrope', sans-serif; font-size: 12px; margin-left: 8px;">Claude Code session</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-flag">You:</span> <span class="term-string">"In 2 hours, refactor the auth module"</span></div>
+              <div>&nbsp;</div>
+              <div><span class="term-flag">Claude:</span> <span class="term-string" style="color: #f59e0b;">&#9888; Agent reminder #16 scheduled.</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Task: refactor the auth module</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">When: Today, 4:30 PM</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">Directory: ~/myproject</span></div>
+              <div>&nbsp;</div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-output">This will execute:</span></div>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="term-cmd">claude</span> <span class="term-flag">-p</span> <span class="term-string">"refactor the auth module"</span> <span class="term-flag">--dangerously-skip-permissions</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Shell Aliases -->
+    <div class="integration-section reveal" id="shell-aliases">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div>
+          <div class="integration-number">02</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Shell Aliases</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Add these to your <code class="font-mono text-sm" style="color: var(--accent);">.bashrc</code>, <code class="font-mono text-sm" style="color: var(--accent);">.zshrc</code>, or shell config. Two-character commands for everything you do daily.
@@ -382,11 +472,11 @@
       </div>
     </div>
 
-    <!-- 2. Cron Jobs -->
+    <!-- 3. Cron Jobs -->
     <div class="integration-section reveal" id="cron-jobs">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
-          <div class="integration-number">02</div>
+          <div class="integration-number">03</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Cron Jobs</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Schedule a daily digest of your reminders. Pipe the JSON output through <code class="font-mono text-sm" style="color: var(--accent);">jq</code> to format it however you want -- terminal, email, Slack webhook, you name it.
@@ -410,11 +500,11 @@
       </div>
     </div>
 
-    <!-- 3. Git Hooks -->
+    <!-- 4. Git Hooks -->
     <div class="integration-section reveal" id="git-hooks">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
-          <div class="integration-number">03</div>
+          <div class="integration-number">04</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Git Hooks</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Automatically create a reminder every time you check out a new branch. Never forget to review, merge, or clean up feature branches again.
@@ -441,11 +531,11 @@
       </div>
     </div>
 
-    <!-- 4. CI/CD -->
+    <!-- 5. CI/CD -->
     <div class="integration-section reveal" id="ci-cd">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
-          <div class="integration-number">04</div>
+          <div class="integration-number">05</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">CI/CD</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Add Remind steps to your GitHub Actions, GitLab CI, or any pipeline. Create reminders to verify deployments, follow up on releases, or notify your team.
@@ -473,11 +563,11 @@
       </div>
     </div>
 
-    <!-- 5. Raycast / Alfred -->
+    <!-- 6. Raycast / Alfred -->
     <div class="integration-section reveal" id="launchers">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
-          <div class="integration-number">05</div>
+          <div class="integration-number">06</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Raycast / Alfred</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Create a custom script command in Raycast or Alfred to quick-add reminders from anywhere on your Mac. Hit your hotkey, type the reminder, and you are done -- without opening a terminal.
@@ -507,11 +597,11 @@
       </div>
     </div>
 
-    <!-- 6. Piping & Scripting -->
+    <!-- 7. Piping & Scripting -->
     <div class="integration-section reveal" id="piping">
       <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         <div>
-          <div class="integration-number">06</div>
+          <div class="integration-number">07</div>
           <h2 class="font-display text-3xl mb-4" style="color: var(--text);">Piping and Scripting</h2>
           <p class="text-base leading-relaxed mb-6" style="color: var(--text-secondary);">
             Remind's <code class="font-mono text-sm" style="color: var(--accent);">--json</code> flag outputs structured data you can pipe into any tool. Filter overdue items, count by priority, build dashboards -- the Unix way.
@@ -565,8 +655,8 @@
           <a href="docs/index.html" class="btn-secondary">Read the Docs</a>
         </div>
         <div class="install-block max-w-md mx-auto">
-          <code><span style="color:#52b788;">$</span> brew install remind-cli</code>
-          <button class="copy-btn" onclick="navigator.clipboard.writeText('brew install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+          <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
         </div>
       </div>
     </div>
@@ -609,7 +699,7 @@
       <hr class="rule mb-8">
 
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2026 Remind. All rights reserved.</p>
         <p class="text-sm" style="color: var(--text-tertiary);">Built with care for the terminal.</p>
       </div>
     </div>

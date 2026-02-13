@@ -23,6 +23,7 @@ dependencies = [
     "pydantic-settings",
     "httpx",
     "tabulate",
+    "fastmcp>=2.0.0",
     "remind-shared>=1.0.1",
     "remind-database>=1.0.1",
 ]

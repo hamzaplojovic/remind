@@ -552,21 +552,21 @@
           <!-- Install tabs -->
           <div class="reveal reveal-delay-4" id="install">
             <div style="display: flex; gap: 0; margin-bottom: -1px; position: relative; z-index: 1;">
-              <button class="install-tab active" data-target="tab-brew" onclick="switchInstallTab(this, 'tab-brew')">Homebrew</button>
-              <button class="install-tab" data-target="tab-curl" onclick="switchInstallTab(this, 'tab-curl')">curl</button>
+              <button class="install-tab active" data-target="tab-uv" onclick="switchInstallTab(this, 'tab-uv')">uv (recommended)</button>
               <button class="install-tab" data-target="tab-pip" onclick="switchInstallTab(this, 'tab-pip')">pip</button>
+              <button class="install-tab" data-target="tab-curl" onclick="switchInstallTab(this, 'tab-curl')">curl</button>
             </div>
-            <div class="install-block" id="tab-brew">
-              <code><span style="color:#52b788;">$</span> brew install remind-cli</code>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('brew install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
-            </div>
-            <div class="install-block" id="tab-curl" style="display:none;">
-              <code><span style="color:#52b788;">$</span> curl -fsSL remind.hamzaplojovic.blog/install | sh</code>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('curl -fsSL remind.hamzaplojovic.blog/install | sh');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+            <div class="install-block" id="tab-uv">
+              <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('uv tool install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
             </div>
             <div class="install-block" id="tab-pip" style="display:none;">
               <code><span style="color:#52b788;">$</span> pip install remind-cli</code>
               <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install remind-cli');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
+            </div>
+            <div class="install-block" id="tab-curl" style="display:none;">
+              <code><span style="color:#52b788;">$</span> curl -fsSL remind.hamzaplojovic.blog/install | sh</code>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('curl -fsSL remind.hamzaplojovic.blog/install | sh');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500);">Copy</button>
             </div>
           </div>
         </div>
@@ -596,11 +596,11 @@
   <div class="py-6 overflow-hidden" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div class="ticker-track">
       <div class="flex items-center gap-16 px-8">
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Loved by 10,000+ developers</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Claude Code integration</span>
         <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS, Linux, Windows</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS and Linux</span>
         <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via Homebrew or pip</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via uv or pip</span>
         <span style="color: var(--border);">&#9670;</span>
         <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">AI-powered smart suggestions</span>
         <span style="color: var(--border);">&#9670;</span>
@@ -610,11 +610,11 @@
         <span style="color: var(--border);">&#9670;</span>
       </div>
       <div class="flex items-center gap-16 px-8" aria-hidden="true">
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Loved by 10,000+ developers</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Claude Code integration</span>
         <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS, Linux, Windows</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Works on macOS and Linux</span>
         <span style="color: var(--border);">&#9670;</span>
-        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via Homebrew or pip</span>
+        <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">Install via uv or pip</span>
         <span style="color: var(--border);">&#9670;</span>
         <span class="text-sm font-semibold tracking-widest uppercase whitespace-nowrap" style="color: var(--text-tertiary); letter-spacing: 0.12em;">AI-powered smart suggestions</span>
         <span style="color: var(--border);">&#9670;</span>
@@ -780,11 +780,11 @@
               <div class="terminal-dot" style="background: #28c840;"></div>
             </div>
             <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind scheduler</span> <span style="color:#52b788;">--enable</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Installed LaunchAgent</span></div>
-              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;~/Library/LaunchAgents/</span></div>
-              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;com.remind.scheduler.plist</span></div>
-              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Scheduler is running</span></div>
+              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind scheduler</span> <span style="color:#52b788;">--run</span></div>
+              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Scheduler started</span></div>
+              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;Checking every 1s</span></div>
+              <div class="term-line" style="padding-left:1rem;"><span style="color:#b0a99e;">&nbsp;&nbsp;Nudges: 30m, 1h, 2h</span></div>
+              <div class="term-line" style="padding-left:1rem;margin-top:4px;"><span style="color:#52b788;">&#10003;</span> <span style="color:#b0a99e;">Listening for due reminders...</span></div>
             </div>
           </div>
         </div>
@@ -843,7 +843,7 @@
           <div class="card-number">07</div>
           <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Usage Reports</h3>
           <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">
-            <code class="font-mono text-sm" style="color: var(--accent);">remind report</code> shows your stats — total reminders, completed this month, overdue count, AI quota used, and plan tier. JSON output for scripting.
+            <code class="font-mono text-sm" style="color: var(--accent);">remind usage</code> shows your stats — total reminders, completed this month, overdue count, AI quota used, and plan tier.
           </p>
           <div class="terminal" style="font-size: 12px;">
             <div class="terminal-bar">
@@ -852,7 +852,7 @@
               <div class="terminal-dot" style="background: #28c840;"></div>
             </div>
             <div class="terminal-body" style="padding: 16px;">
-              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind report</span></div>
+              <div class="term-line"><span class="term-prompt">~</span> <span class="term-cmd">remind usage</span></div>
               <div class="term-line" style="margin-top:6px;"><span style="color:#b0a99e;">Total</span> <span style="color:#6b645c;">··········</span> <span style="color:#f0ebe4;">47</span></div>
               <div class="term-line"><span style="color:#b0a99e;">Done this month</span> <span style="color:#6b645c;">·</span> <span style="color:#52b788;">23</span></div>
               <div class="term-line"><span style="color:#b0a99e;">Overdue</span> <span style="color:#6b645c;">········</span> <span style="color:#e8503a;">2</span></div>
@@ -883,9 +883,9 @@
         <div class="reveal reveal-delay-1">
           <div class="font-display text-6xl mb-6" style="color: var(--border);">1</div>
           <h3 class="font-display text-2xl mb-3" style="color: var(--text);">Install</h3>
-          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">One command. Homebrew, pip, or download the binary directly. Works on every major platform.</p>
+          <p class="mb-6" style="color: var(--text-secondary); line-height: 1.7;">One command. uv, pip, or download directly. Works on macOS and Linux.</p>
           <div class="install-block">
-            <code><span style="color:#52b788;">$</span> brew install remind-cli</code>
+            <code><span style="color:#52b788;">$</span> uv tool install remind-cli</code>
           </div>
         </div>
 
@@ -938,7 +938,7 @@
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5 AI suggestions / month</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Basic notifications</li>
-            <li class="flex gap-3"><span style="color: var(--text-tertiary);">&#8212;</span><span style="color: var(--text-tertiary);">Background scheduler</span></li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Background scheduler</li>
           </ul>
           <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/free" class="btn-secondary w-full justify-center">Get Started</a>
         </div>
@@ -984,9 +984,9 @@
           <hr class="rule-dotted mb-8">
           <ul class="space-y-4 mb-10" style="color: var(--text-secondary); font-size: 0.95rem;">
             <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> 5,000+ AI suggestions / month</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Shared team reminders</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Analytics dashboard</li>
-            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Dedicated support</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Unlimited reminders</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Agent reminders (Claude Code)</li>
+            <li class="flex gap-3"><span style="color: var(--accent-secondary);">&#10003;</span> Priority support</li>
           </ul>
           <a href="https://remind-production-0871.up.railway.app/api/v1/checkout/team" class="btn-secondary w-full justify-center">Get Team</a>
         </div>
@@ -1066,16 +1066,16 @@
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
         <div class="feature-card reveal reveal-delay-1" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">10,000+</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">Downloads</p>
+          <div class="font-display text-4xl mb-2" style="color: var(--text);">PyPI</div>
+          <p class="text-sm" style="color: var(--text-tertiary);">Published</p>
         </div>
         <div class="feature-card reveal reveal-delay-2" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">200+</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">GitHub Stars</p>
+          <div class="font-display text-4xl mb-2" style="color: var(--text);">MCP</div>
+          <p class="text-sm" style="color: var(--text-tertiary);">Server Built-in</p>
         </div>
         <div class="feature-card reveal reveal-delay-3" style="text-align: center; padding: 2rem;">
-          <div class="font-display text-4xl mb-2" style="color: var(--text);">30+</div>
-          <p class="text-sm" style="color: var(--text-tertiary);">Contributors</p>
+          <div class="font-display text-4xl mb-2" style="color: var(--text);">6</div>
+          <p class="text-sm" style="color: var(--text-tertiary);">AI Tools</p>
         </div>
         <div class="feature-card reveal reveal-delay-4" style="text-align: center; padding: 2rem;">
           <div class="font-display text-4xl mb-2" style="color: var(--text);">MIT</div>
@@ -1116,11 +1116,9 @@
         <div class="reveal reveal-delay-2">
           <div class="install-block" style="font-size: 1rem; padding: 1.5rem 2rem;">
             <div>
-              <div style="margin-bottom: 8px;"><span style="color:#52b788;">$</span> brew install remind-cli</div>
+              <div style="margin-bottom: 8px;"><span style="color:#52b788;">$</span> uv tool install remind-cli</div>
               <div style="margin-bottom: 8px;"><span style="color:#6b645c;"># or</span></div>
-              <div style="margin-bottom: 8px;"><span style="color:#52b788;">$</span> pip install remind-cli</div>
-              <div><span style="color:#6b645c;"># or</span></div>
-              <div><span style="color:#52b788;">$</span> curl -fsSL remind.hamzaplojovic.blog/install | sh</div>
+              <div><span style="color:#52b788;">$</span> pip install remind-cli</div>
             </div>
           </div>
         </div>
@@ -1213,7 +1211,7 @@
       <hr class="rule mb-8">
 
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2025 Remind. All rights reserved.</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">&copy; 2026 Remind. All rights reserved.</p>
         <p class="text-sm" style="color: var(--text-tertiary);">Built with care for the terminal.</p>
       </div>
     </div>
@@ -1225,7 +1223,7 @@
     function switchInstallTab(btn, targetId) {
       document.querySelectorAll('.install-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
-      document.querySelectorAll('#tab-brew, #tab-curl, #tab-pip').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('#tab-uv, #tab-pip, #tab-curl').forEach(p => p.style.display = 'none');
       document.getElementById(targetId).style.display = 'flex';
     }
 

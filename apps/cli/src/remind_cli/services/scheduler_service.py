@@ -1,6 +1,8 @@
 """Scheduler service for running background reminders."""
 
+import re
 import signal
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -9,6 +11,8 @@ from remind_database import DatabaseConfig, DatabaseSession
 from remind_cli import output
 from remind_cli.notifications import NotificationManager
 from remind_cli.services.reminder_service import ReminderService
+
+AGENT_PATTERN = re.compile(r"^\[AGENT:(.+?)\]\s*(.+)$")
 
 
 class SchedulerRunner:
@@ -84,7 +88,12 @@ class SchedulerRunner:
             output.error(f"Error in scheduler check: {e}")
 
     def _send_notification(self, reminder) -> None:
-        """Send initial notification for a due reminder."""
+        """Send initial notification for a due reminder, or execute agent task."""
+        match = AGENT_PATTERN.match(reminder.text)
+        if match:
+            self._execute_agent_task(reminder, match.group(1), match.group(2))
+            return
+
         try:
             self.notifications.notify_reminder_due(
                 reminder.text,
@@ -92,6 +101,44 @@ class SchedulerRunner:
             )
         except Exception as e:
             output.error(f"Error sending notification: {e}")
+
+    def _execute_agent_task(self, reminder, cwd: str, task: str) -> None:
+        """Execute a Claude Code agent task."""
+        output.info(f"Executing agent task #{reminder.id}: {task} (in {cwd})")
+        try:
+            self.notifications.notify_reminder_due(
+                f"Agent starting: {task}",
+                sound=True,
+            )
+            result = subprocess.run(
+                ["claude", "-p", task, "--dangerously-skip-permissions"],
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                timeout=600,  # 10 minute timeout
+            )
+            if result.returncode == 0:
+                output.info(f"Agent task #{reminder.id} completed successfully")
+                self.notifications.notify_reminder_due(
+                    f"Agent completed: {task}",
+                    sound=True,
+                )
+            else:
+                output.error(f"Agent task #{reminder.id} failed: {result.stderr[:200]}")
+                self.notifications.notify_reminder_due(
+                    f"Agent failed: {task}",
+                    sound=True,
+                )
+        except subprocess.TimeoutExpired:
+            output.error(f"Agent task #{reminder.id} timed out after 10 minutes")
+            self.notifications.notify_reminder_due(
+                f"Agent timed out: {task}",
+                sound=True,
+            )
+        except FileNotFoundError:
+            output.error(f"Claude CLI not found. Install it to use agent reminders.")
+        except Exception as e:
+            output.error(f"Agent task error: {e}")
 
     def _send_nudge(self, reminder) -> None:
         """Send nudge notification for an escalated reminder."""

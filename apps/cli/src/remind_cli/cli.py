@@ -29,6 +29,12 @@ def scheduler(
         raise typer.Exit(1)
 
 
+def mcp() -> None:
+    """Start the MCP server for Claude Code integration."""
+    from remind_cli.mcp_server import run_mcp_server
+    run_mcp_server()
+
+
 def version_callback(value: bool) -> None:
     if value:
         typer.echo(f"remind {__version__}")
@@ -113,3 +119,4 @@ app.command()(upgrade)
 app.command()(update)
 app.command()(uninstall)
 app.command(hidden=True)(scheduler)
+app.command()(mcp)
