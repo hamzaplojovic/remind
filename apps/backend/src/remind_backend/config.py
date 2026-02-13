@@ -12,11 +12,8 @@ _ENV_FILE = Path(__file__).resolve().parents[4] / ".env"
 class Settings(BaseSettings):
     """Application settings."""
 
-    # Database
-    database_url: str = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///./remind.db",
-    )
+    # Database (PostgreSQL required)
+    database_url: str = os.getenv("DATABASE_URL", "")
 
     # API
     api_title: str = "Remind Backend"
@@ -28,6 +25,7 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: list[str] = [
         "https://remind.dev",
+        "https://remind-production-0871.up.railway.app",
         "http://localhost:3000",
         "http://localhost:8000",
     ]

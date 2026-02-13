@@ -2,10 +2,16 @@
 
 import os
 from logging.config import fileConfig
+from pathlib import Path
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+
+# Load .env from monorepo root
+_env_file = Path(__file__).resolve().parents[3] / ".env"
+load_dotenv(_env_file)
 
 # This is the Alembic Config object
 config = context.config

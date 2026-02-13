@@ -74,7 +74,7 @@ reset-db:
 	rm -f apps/cli/src/remind_cli/*.db-wal
 	rm -f apps/cli/src/remind_cli/*.db-shm
 	$(MAKE) migrate-cli
-	$(MAKE) migrate-backend
+	@echo "Run 'make migrate-backend' separately with DATABASE_URL set to reset the backend PG database."
 
 docker-up:
 	docker-compose -f infrastructure/docker/docker-compose.yml up -d

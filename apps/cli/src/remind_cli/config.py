@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     notifications_enabled: bool = True
     notification_sound_enabled: bool = True
     ai_rephrasing_enabled: bool = True
-    ai_backend_url: str | None = "http://localhost:8000"
+    ai_backend_url: str | None = "https://remind-production-0871.up.railway.app"
     openai_api_key: str | None = None
     nudge_intervals_minutes: str = "5,15,60"
 

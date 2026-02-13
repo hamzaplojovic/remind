@@ -4,7 +4,7 @@
 Usage:
     python create_user.py --email user@example.com --plan indie
     python create_user.py --email user@example.com --plan pro --expires 2026-12-31
-    python create_user.py --email user@example.com --plan free --database-url sqlite:///./remind.db
+    python create_user.py --email user@example.com --plan free --database-url postgresql://user:pass@host/remind
 """
 
 import argparse
@@ -30,9 +30,7 @@ def create_user(
     """Insert a new user into the database and return their details."""
     from sqlalchemy import create_engine, text
 
-    is_sqlite = "sqlite" in database_url
-    connect_args = {"check_same_thread": False} if is_sqlite else {}
-    engine = create_engine(database_url, connect_args=connect_args)
+    engine = create_engine(database_url)
 
     token = generate_token(plan_tier)
     now = datetime.now(timezone.utc)
@@ -70,18 +68,17 @@ def main():
     parser.add_argument(
         "--database-url",
         default=None,
-        help="Database URL (defaults to DATABASE_URL env var, then sqlite:///./remind.db)",
+        help="Database URL (defaults to DATABASE_URL env var)",
     )
     args = parser.parse_args()
 
     # Resolve database URL
     import os
 
-    # Default to the backend database relative to monorepo root
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    monorepo_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
-    default_db = f"sqlite:///{os.path.join(monorepo_root, 'apps', 'backend', 'remind.db')}"
-    database_url = args.database_url or os.getenv("DATABASE_URL", default_db)
+    database_url = args.database_url or os.getenv("DATABASE_URL")
+    if not database_url:
+        print("Error: DATABASE_URL env var is not set and --database-url was not provided.", file=sys.stderr)
+        sys.exit(1)
 
     # Parse expiration
     expires_at = None
