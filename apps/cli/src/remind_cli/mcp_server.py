@@ -1,7 +1,7 @@
 """MCP server for Remind CLI — exposes reminder tools to Claude Code and other MCP clients."""
 
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from dateparser import parse as dateparser_parse
 from fastmcp import FastMCP
@@ -9,6 +9,7 @@ from fastmcp import FastMCP
 from remind_database import DatabaseConfig, DatabaseSession
 from remind_shared import PriorityLevel
 from remind_cli.services.reminder_service import ReminderService
+from remind_cli.config import load_config, save_config
 
 mcp = FastMCP("Remind")
 
@@ -295,6 +296,262 @@ def agent_reminder(
         )
     except Exception as e:
         return f"Error creating agent reminder: {e}"
+
+
+@mcp.tool
+def get_context() -> str:
+    """Get reminders filtered by project context (auto-detected from current directory).
+
+    Returns:
+        Formatted list of reminders for the current project.
+    """
+    cwd = os.getcwd()
+    project_name = os.path.basename(cwd)
+
+    db_session = _get_db_session()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        reminders = service.get_project_reminders(project_name)
+
+    if not reminders:
+        return f"No reminders found for project '{project_name}'."
+
+    lines = [f"Project reminders for '{project_name}':"]
+    now = datetime.now(timezone.utc)
+    for r in reminders:
+        status = ""
+        if r.done_at:
+            status = " [DONE]"
+        else:
+            due_utc = r.due_at.replace(tzinfo=timezone.utc) if r.due_at.tzinfo is None else r.due_at
+            if due_utc < now:
+                status = " [OVERDUE]"
+        lines.append(f"#{r.id} [{r.priority.value.upper()}] {r.text} — {r.due_at}{status}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def get_overdue() -> str:
+    """Get all overdue reminders (not completed).
+
+    Returns:
+        Formatted list of overdue reminders or message if none.
+    """
+    db_session = _get_db_session()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        overdue = service.get_overdue_reminders()
+
+    if not overdue:
+        return "No overdue reminders."
+
+    lines = [f"You have {len(overdue)} overdue reminder(s):"]
+    for r in overdue:
+        lines.append(f"#{r.id} [{r.priority.value.upper()}] {r.text} — due: {r.due_at}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def get_upcoming(hours: int = 24) -> str:
+    """Get reminders due within the next N hours.
+
+    Args:
+        hours: How many hours ahead to look (default 24).
+
+    Returns:
+        Formatted list of upcoming reminders.
+    """
+    db_session = _get_db_session()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        upcoming = service.get_upcoming_reminders(hours)
+
+    if not upcoming:
+        return f"No reminders due in the next {hours} hours."
+
+    lines = [f"Reminders due in the next {hours} hours:"]
+    for r in upcoming:
+        lines.append(f"#{r.id} [{r.priority.value.upper()}] {r.text} — due: {r.due_at}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def snooze_reminder(reminder_id: int, duration: str) -> str:
+    """Snooze a reminder by a relative duration from now.
+
+    Args:
+        reminder_id: The ID of the reminder to snooze.
+        duration: Duration (e.g., "2 hours", "1 day", "30 minutes").
+
+    Returns:
+        Confirmation with updated due date.
+    """
+    # Simple duration parsing
+    duration_map = {
+        "minute": 60,
+        "hour": 3600,
+        "day": 86400,
+        "week": 604800,
+    }
+
+    try:
+        parts = duration.lower().split()
+        if len(parts) != 2:
+            return "Duration format: '<number> <unit>' (e.g., '2 hours', '1 day')"
+
+        amount = int(parts[0])
+        unit = parts[1].rstrip("s")  # Remove trailing 's' from plural
+
+        if unit not in duration_map:
+            return f"Unknown unit: {unit}. Use: minute, hour, day, or week"
+
+        seconds = amount * duration_map[unit]
+        td = timedelta(seconds=seconds)
+
+        db_session = _get_db_session()
+        with db_session.get_session() as session:
+            service = ReminderService(session)
+            reminder = service.snooze_reminder(reminder_id, td)
+
+        return f"Snoozed reminder #{reminder.id} until {reminder.due_at}"
+    except ValueError:
+        return "Invalid duration format. Use: '<number> <unit>' (e.g., '2 hours')"
+    except Exception as e:
+        return f"Error: {e}"
+
+
+@mcp.tool
+def bulk_complete(reminder_ids: str) -> str:
+    """Complete multiple reminders at once.
+
+    Args:
+        reminder_ids: Comma-separated reminder IDs (e.g., "1,5,12").
+
+    Returns:
+        Confirmation of completed reminders.
+    """
+    try:
+        ids = [int(x.strip()) for x in reminder_ids.split(",")]
+        db_session = _get_db_session()
+        with db_session.get_session() as session:
+            service = ReminderService(session)
+            completed = service.bulk_complete(ids)
+
+        if not completed:
+            return f"No reminders found to complete for IDs: {reminder_ids}"
+
+        lines = [f"Completed {len(completed)} reminder(s):"]
+        for r in completed:
+            lines.append(f"#{r.id} — {r.text}")
+
+        return "\n".join(lines)
+    except ValueError:
+        return "Invalid format. Use comma-separated IDs: '1,5,12'"
+    except Exception as e:
+        return f"Error: {e}"
+
+
+@mcp.tool
+def get_summary() -> str:
+    """Get a structured summary of all reminders.
+
+    Returns:
+        Summary with overdue count, due today, due this week, by priority and project.
+    """
+    db_session = _get_db_session()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        summary = service.get_summary()
+
+    lines = [
+        f"📋 Reminder Summary",
+        f"━━━━━━━━━━━━━━━━━━",
+        f"",
+        f"Total active: {summary['total_active']}",
+        f"🔴 Overdue: {summary['overdue_count']}",
+        f"📅 Due today: {summary['due_today_count']}",
+        f"📆 Due this week: {summary['due_this_week_count']}",
+        f"",
+    ]
+
+    if summary["by_priority"]:
+        lines.append("By Priority:")
+        for priority, count in sorted(summary["by_priority"].items()):
+            lines.append(f"  {priority.upper()}: {count}")
+        lines.append("")
+
+    if summary["by_project"]:
+        lines.append("By Project:")
+        for project, count in sorted(summary["by_project"].items()):
+            lines.append(f"  {project}: {count}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def get_config(key: str | None = None) -> str:
+    """Get configuration settings.
+
+    Args:
+        key: Optional specific setting key (e.g., 'timezone', 'notifications_enabled').
+             If omitted, returns all settings.
+
+    Returns:
+        Configuration value(s).
+    """
+    try:
+        config = load_config()
+        if key:
+            value = getattr(config, key, None)
+            if value is None:
+                return f"Setting '{key}' not found."
+            return f"{key}: {value}"
+
+        # Return all settings
+        lines = ["Current Configuration:"]
+        for field in config.model_fields:
+            value = getattr(config, field)
+            lines.append(f"  {field}: {value}")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Error reading config: {e}"
+
+
+@mcp.tool
+def set_config(key: str, value: str) -> str:
+    """Set a configuration setting.
+
+    Args:
+        key: Setting key (e.g., 'timezone', 'notifications_enabled').
+        value: New value (boolean settings use 'true'/'false').
+
+    Returns:
+        Confirmation of updated setting.
+    """
+    try:
+        config = load_config()
+
+        # Parse value based on field type
+        field = config.model_fields.get(key)
+        if not field:
+            return f"Unknown setting: {key}"
+
+        field_type = field.annotation
+        if field_type is bool or str(field_type) == "<class 'bool'>":
+            parsed_value = value.lower() in ("true", "1", "yes", "on")
+        elif field_type is int or str(field_type) == "<class 'int'>":
+            parsed_value = int(value)
+        else:
+            parsed_value = value
+
+        setattr(config, key, parsed_value)
+        save_config(config)
+        return f"Updated {key} to {parsed_value}"
+    except Exception as e:
+        return f"Error: {e}"
 
 
 def run_mcp_server() -> None:

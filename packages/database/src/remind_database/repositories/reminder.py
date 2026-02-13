@@ -1,6 +1,6 @@
 """Reminder repository for database access."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
@@ -125,8 +125,6 @@ class ReminderRepository:
     def get_upcoming(self, hours: int = 24) -> list[Reminder]:
         """Get reminders due within the next N hours."""
         now = datetime.now()
-        from datetime import timedelta
-
         future = now + timedelta(hours=hours)
         reminders = (
             self.session.query(ReminderModel)
@@ -137,3 +135,78 @@ class ReminderRepository:
             .all()
         )
         return [r.to_pydantic() for r in reminders]
+
+    def get_by_project(self, project_context: str, include_done: bool = False) -> list[Reminder]:
+        """Get reminders filtered by project context."""
+        query = self.session.query(ReminderModel).filter(
+            ReminderModel.project_context.ilike(f"%{project_context}%")
+        )
+        if not include_done:
+            query = query.filter(ReminderModel.done_at.is_(None))
+        reminders = query.order_by(ReminderModel.due_at).all()
+        return [r.to_pydantic() for r in reminders]
+
+    def bulk_mark_done(self, reminder_ids: list[int]) -> list[Reminder]:
+        """Mark multiple reminders as done. Returns the ones that were completed."""
+        now = datetime.now()
+        reminders = (
+            self.session.query(ReminderModel)
+            .filter(ReminderModel.id.in_(reminder_ids))
+            .filter(ReminderModel.done_at.is_(None))
+            .all()
+        )
+        for r in reminders:
+            r.done_at = now
+        self.session.commit()
+        for r in reminders:
+            self.session.refresh(r)
+        return [r.to_pydantic() for r in reminders]
+
+    def get_due_today(self) -> list[Reminder]:
+        """Get reminders due today (not done)."""
+        now = datetime.now()
+        end_of_day = now.replace(hour=23, minute=59, second=59)
+        reminders = (
+            self.session.query(ReminderModel)
+            .filter(ReminderModel.due_at <= end_of_day)
+            .filter(ReminderModel.done_at.is_(None))
+            .order_by(ReminderModel.due_at)
+            .all()
+        )
+        return [r.to_pydantic() for r in reminders]
+
+    def get_due_this_week(self) -> list[Reminder]:
+        """Get reminders due within the next 7 days (not done)."""
+        now = datetime.now()
+        end_of_week = now + timedelta(days=7)
+        reminders = (
+            self.session.query(ReminderModel)
+            .filter(ReminderModel.due_at <= end_of_week)
+            .filter(ReminderModel.done_at.is_(None))
+            .order_by(ReminderModel.due_at)
+            .all()
+        )
+        return [r.to_pydantic() for r in reminders]
+
+    def count_by_priority(self) -> dict[str, int]:
+        """Count active reminders grouped by priority."""
+        from sqlalchemy import func
+        results = (
+            self.session.query(ReminderModel.priority, func.count())
+            .filter(ReminderModel.done_at.is_(None))
+            .group_by(ReminderModel.priority)
+            .all()
+        )
+        return {priority: count for priority, count in results}
+
+    def count_by_project(self) -> dict[str, int]:
+        """Count active reminders grouped by project context."""
+        from sqlalchemy import func
+        results = (
+            self.session.query(ReminderModel.project_context, func.count())
+            .filter(ReminderModel.done_at.is_(None))
+            .filter(ReminderModel.project_context.isnot(None))
+            .group_by(ReminderModel.project_context)
+            .all()
+        )
+        return {project: count for project, count in results}

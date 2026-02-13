@@ -1,6 +1,6 @@
 """Reminder service - business logic for reminder operations."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 from remind_shared import Reminder, PriorityLevel, ValidationError
@@ -149,3 +149,46 @@ class ReminderService:
         """Get reminders due within the next N hours."""
         repo = ReminderRepository(self.session)
         return repo.get_upcoming(hours)
+
+    def get_project_reminders(self, project: str, include_done: bool = False) -> list[Reminder]:
+        """Get reminders filtered by project context."""
+        repo = ReminderRepository(self.session)
+        return repo.get_by_project(project, include_done)
+
+    def snooze_reminder(self, reminder_id: int, duration: timedelta) -> Reminder:
+        """Snooze a reminder by a relative duration from now."""
+        repo = ReminderRepository(self.session)
+        new_due = datetime.now() + duration
+        reminder = repo.update(reminder_id=reminder_id, due_at=new_due)
+        if not reminder:
+            raise ValidationError(f"Reminder {reminder_id} not found")
+        return reminder
+
+    def bulk_complete(self, reminder_ids: list[int]) -> list[Reminder]:
+        """Complete multiple reminders at once."""
+        repo = ReminderRepository(self.session)
+        return repo.bulk_mark_done(reminder_ids)
+
+    def get_summary(self) -> dict:
+        """Get a structured summary of all reminders."""
+        repo = ReminderRepository(self.session)
+        overdue = repo.get_overdue()
+        due_today = repo.get_due_today()
+        due_this_week = repo.get_due_this_week()
+        by_priority = repo.count_by_priority()
+        by_project = repo.count_by_project()
+        active = repo.list_active()
+
+        # due_today includes overdue — separate them
+        today_only = [r for r in due_today if r.id not in {o.id for o in overdue}]
+
+        return {
+            "total_active": len(active),
+            "overdue_count": len(overdue),
+            "overdue": overdue,
+            "due_today_count": len(today_only),
+            "due_today": today_only,
+            "due_this_week_count": len(due_this_week),
+            "by_priority": by_priority,
+            "by_project": by_project,
+        }
