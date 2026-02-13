@@ -25,7 +25,6 @@ dependencies = [
     "tabulate",
     "remind-shared>=1.0.1",
     "remind-database>=1.0.1",
-    "simpleaudio>=1.0.4",
 ]
 
 [project.optional-dependencies]

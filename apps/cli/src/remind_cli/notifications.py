@@ -1,10 +1,10 @@
 """Notification system for Remind."""
 
+import io
 import math
 import struct
 import subprocess
 import wave
-import io
 from collections.abc import Callable
 
 from remind_cli.platform_utils import get_platform
@@ -14,17 +14,12 @@ try:
 except ImportError:
     Notify = None  # type: ignore
 
-try:
-    import simpleaudio as sa
-except ImportError:
-    sa = None  # type: ignore
 
-
-def _generate_tone(frequency: float, duration_ms: int, volume: float = 0.5) -> bytes:
+def _generate_wav(frequency: float, duration_ms: int, volume: float = 0.5) -> bytes:
     """Generate a WAV tone in memory.
 
     Args:
-        frequency: Tone frequency in Hz
+        frequency: Tone frequency in Hz (0 for silence)
         duration_ms: Duration in milliseconds
         volume: Volume from 0.0 to 1.0
     """
@@ -32,8 +27,6 @@ def _generate_tone(frequency: float, duration_ms: int, volume: float = 0.5) -> b
     num_samples = int(sample_rate * duration_ms / 1000)
     samples = []
     for i in range(num_samples):
-        t = i / sample_rate
-        # Apply fade in/out to avoid clicks (10ms fade)
         fade_samples = int(sample_rate * 0.01)
         if i < fade_samples:
             envelope = i / fade_samples
@@ -41,7 +34,7 @@ def _generate_tone(frequency: float, duration_ms: int, volume: float = 0.5) -> b
             envelope = (num_samples - i) / fade_samples
         else:
             envelope = 1.0
-        value = volume * envelope * math.sin(2 * math.pi * frequency * t)
+        value = volume * envelope * math.sin(2 * math.pi * frequency * i / sample_rate)
         samples.append(int(value * 32767))
 
     buf = io.BytesIO()
@@ -53,32 +46,14 @@ def _generate_tone(frequency: float, duration_ms: int, volume: float = 0.5) -> b
     return buf.getvalue()
 
 
-def _generate_alert(urgency: str = "normal") -> bytes:
-    """Generate an alert sound based on urgency level."""
-    if urgency == "critical":
-        # Sharp high-pitched beep
-        return _generate_tone(880, 300, 0.7)
-    elif urgency == "low":
-        return _generate_tone(440, 200, 0.3)
-    else:
-        # Normal: pleasant two-tone chime
-        return _generate_tone(660, 300, 0.5)
-
-
 class NotificationManager:
-    """Unified notification interface across platforms.
-
-    Provides graceful degradation:
-    - If notify-py unavailable: prints to console
-    - If sound player unavailable: sends notification without sound
-    """
+    """Unified notification interface across platforms."""
 
     def __init__(self, app_name: str = "Remind", strict: bool = False):
         """Initialize notification manager."""
         self.app_name = app_name
         self.platform_info = get_platform()
         self.notifications_available = Notify is not None
-        self.sound_available = sa is not None or self.platform_info.is_macos
 
         if not self.notifications_available and strict:
             raise ImportError("notify-py not installed. Install with: pip install notify-py")
@@ -87,45 +62,59 @@ class NotificationManager:
         """Check if notifications can be sent."""
         return self.notifications_available
 
-    def is_sound_available(self) -> bool:
-        """Check if sound playback is available."""
-        return self.sound_available
-
     def _play_sound(self, urgency: str = "normal") -> None:
-        """Play an alert sound based on urgency. Best-effort, never raises."""
-        if not self.sound_available:
-            return
+        """Play an alert sound. Best-effort, never raises."""
+        try:
+            if self.platform_info.is_macos:
+                self._play_sound_macos(urgency)
+            elif self.platform_info.is_linux:
+                self._play_sound_linux(urgency)
+        except Exception:
+            pass
 
-        if self.platform_info.is_macos:
-            sounds = {
-                "critical": "Glass",
-                "normal": "Ping",
-                "low": "Pop",
-            }
-            sound = sounds.get(urgency, "Ping")
+    def _play_sound_macos(self, urgency: str) -> None:
+        """Play sound on macOS using afplay."""
+        sounds = {"critical": "Glass", "normal": "Ping", "low": "Pop"}
+        sound = sounds.get(urgency, "Ping")
+        subprocess.run(
+            ["afplay", f"/System/Library/Sounds/{sound}.aiff"],
+            timeout=10,
+            capture_output=True,
+        )
+
+    def _play_sound_linux(self, urgency: str) -> None:
+        """Play sound on Linux using aplay with generated WAV data.
+
+        aplay is part of alsa-utils, installed by default on virtually
+        every desktop Linux distribution.
+        """
+        tones = {
+            "critical": (880, 300, 0.7),
+            "normal": (660, 300, 0.5),
+            "low": (440, 200, 0.3),
+        }
+        freq, duration, vol = tones.get(urgency, (660, 300, 0.5))
+        wav_data = _generate_wav(freq, duration, vol)
+
+        # Try players in order: aplay (ALSA, universal), paplay (PulseAudio), pw-play (PipeWire)
+        for player_cmd in [
+            ["aplay", "-q", "-"],
+            ["paplay", "--raw", "--rate=44100", "--channels=1", "--format=s16le"],
+            ["pw-play", "--rate=44100", "--channels=1", "--format=s16", "-"],
+        ]:
             try:
-                subprocess.run(
-                    ["afplay", f"/System/Library/Sounds/{sound}.aiff"],
+                proc = subprocess.run(
+                    player_cmd,
+                    input=wav_data,
                     timeout=10,
                     capture_output=True,
                 )
+                if proc.returncode == 0:
+                    return
+            except FileNotFoundError:
+                continue
             except Exception:
-                pass
-        else:
-            # Linux / other: use simpleaudio with generated tones
-            self._play_sound_simpleaudio(urgency)
-
-    def _play_sound_simpleaudio(self, urgency: str = "normal") -> None:
-        """Play a generated alert tone via simpleaudio (ALSA on Linux)."""
-        if sa is None:
-            return
-        try:
-            wav_data = _generate_alert(urgency)
-            wave_obj = sa.WaveObject.from_wave_file(io.BytesIO(wav_data))
-            play_obj = wave_obj.play()
-            play_obj.wait_done()
-        except Exception:
-            pass
+                continue
 
     def notify(
         self,
@@ -135,12 +124,7 @@ class NotificationManager:
         callback: Callable[[], None] | None = None,
         sound: bool = False,
     ) -> bool:
-        """Send a native desktop notification.
-
-        Returns:
-            True if notification sent successfully, False otherwise.
-        """
-        # Play sound if enabled
+        """Send a native desktop notification."""
         if sound:
             self._play_sound(urgency)
 
@@ -166,11 +150,7 @@ class NotificationManager:
     def _notify_macos(self, title: str, message: str, urgency: str = "normal") -> bool:
         """Send macOS notification using AppleScript."""
         message_escaped = message.replace('"', '\\"')
-        urgency_sound = {
-            "critical": "Alarm",
-            "normal": "Ping",
-            "low": "Pop",
-        }
+        urgency_sound = {"critical": "Alarm", "normal": "Ping", "low": "Pop"}
         sound = urgency_sound.get(urgency, "Ping")
         script = f'display notification "{message_escaped}" with title "Remind" sound name "{sound}"'
 

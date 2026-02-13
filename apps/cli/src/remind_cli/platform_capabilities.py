@@ -48,12 +48,13 @@ class PlatformCapabilities:
                     timeout=2,
                 )
                 return result.returncode == 0
-            elif player == "simpleaudio":
-                try:
-                    import simpleaudio  # noqa: F401
-                    return True
-                except ImportError:
-                    return False
+            elif player == "aplay":
+                result = subprocess.run(
+                    [player, "--version"],
+                    capture_output=True,
+                    timeout=2,
+                )
+                return result.returncode == 0
             else:
                 return True
         except (subprocess.TimeoutExpired, FileNotFoundError):
