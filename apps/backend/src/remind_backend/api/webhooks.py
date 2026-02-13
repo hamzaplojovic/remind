@@ -54,13 +54,44 @@ async def polar_webhook(request: Request):
 
     logger.info("Polar webhook received: %s", event_type)
 
-    if event_type in ("order.created", "subscription.created"):
+    if event_type in ("order.created", "order.paid", "subscription.created"):
         event_data = event.data if hasattr(event, "data") else event.get("data", {})
         await _handle_order(event_data)
+    elif event_type == "checkout.updated":
+        event_data = event.data if hasattr(event, "data") else event.get("data", {})
+        status = getattr(event_data, "status", None) or event_data.get("status", "")
+        if status == "succeeded":
+            await _handle_checkout(event_data)
     else:
         logger.info("Ignoring event type: %s", event_type)
 
     return {"status": "ok"}
+
+
+async def _handle_checkout(data):
+    """Process a completed checkout — extract email and product, delegate to _handle_order."""
+    if hasattr(data, "customer_email"):
+        email = data.customer_email
+    else:
+        email = data.get("customer_email") or data.get("customer", {}).get("email")
+
+    if hasattr(data, "product"):
+        product = data.product
+        product_id = getattr(product, "id", "")
+    elif hasattr(data, "product_id"):
+        product_id = data.product_id
+    else:
+        product_id = data.get("product_id", "") or data.get("product", {}).get("id", "")
+
+    if not email:
+        logger.error("No email in checkout payload: %s", data)
+        return
+
+    # Build a minimal dict that _handle_order understands
+    await _handle_order({
+        "customer": {"email": email},
+        "product": {"id": product_id},
+    })
 
 
 async def _handle_order(data):
