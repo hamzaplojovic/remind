@@ -7,7 +7,7 @@ from groq import AsyncGroq
 
 from remind_backend.config import get_settings
 from remind_backend.models import PriorityLevel
-from remind_backend.prompt import build_suggestion_prompt
+from remind_backend.prompt import SYSTEM_PROMPT, build_suggestion_prompt
 
 
 class AIResponse(TypedDict):
@@ -43,8 +43,12 @@ async def suggest_reminder(reminder_text: str) -> AIResponse:
 
     response = await client.chat.completions.create(
         model=settings.ai_model,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
         temperature=0.3,
+        max_tokens=150,
     )
 
     # Parse response
