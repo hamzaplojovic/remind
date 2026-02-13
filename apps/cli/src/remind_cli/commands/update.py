@@ -89,13 +89,13 @@ def update() -> None:
         output.blank()
         try:
             subprocess.run(
-                ["uv", "tool", "upgrade", "remind-cli"],
+                ["uv", "tool", "install", "remind-cli", "--force"],
                 check=True,
             )
             output.blank()
             output.success("Updated successfully.")
         except subprocess.CalledProcessError:
-            output.error("uv update failed. Try: uv tool upgrade remind-cli")
+            output.error("uv update failed. Try: uv tool install remind-cli --force")
             raise typer.Exit(1)
 
     elif method == "pip":
