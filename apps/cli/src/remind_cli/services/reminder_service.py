@@ -97,6 +97,44 @@ class ReminderService:
         repo = ReminderRepository(self.session)
         return repo.search(query)
 
+    def update_reminder(
+        self,
+        reminder_id: int,
+        text: str | None = None,
+        due_at: datetime | None = None,
+        priority: PriorityLevel | None = None,
+        project_context: str | None = None,
+    ) -> Reminder:
+        """Update a reminder's fields.
+
+        Args:
+            reminder_id: ID of the reminder to update
+            text: New text (optional)
+            due_at: New due date (optional)
+            priority: New priority (optional)
+            project_context: New project context (optional)
+
+        Returns:
+            Updated reminder
+
+        Raises:
+            ValidationError: If reminder not found or validation fails
+        """
+        if text is not None and (not text or len(text) > 1000):
+            raise ValidationError("Reminder text must be 1-1000 characters")
+
+        repo = ReminderRepository(self.session)
+        reminder = repo.update(
+            reminder_id=reminder_id,
+            text=text,
+            due_at=due_at,
+            priority=priority,
+            project_context=project_context,
+        )
+        if not reminder:
+            raise ValidationError(f"Reminder {reminder_id} not found")
+        return reminder
+
     def delete_reminder(self, reminder_id: int) -> bool:
         """Delete a reminder permanently."""
         repo = ReminderRepository(self.session)

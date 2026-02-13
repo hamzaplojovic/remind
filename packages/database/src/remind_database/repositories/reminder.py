@@ -77,6 +77,30 @@ class ReminderRepository:
         )
         return [r.to_pydantic() for r in reminders]
 
+    def update(
+        self,
+        reminder_id: int,
+        text: str | None = None,
+        due_at: datetime | None = None,
+        priority: PriorityLevel | None = None,
+        project_context: str | None = None,
+    ) -> Reminder | None:
+        """Update a reminder's fields. Only non-None fields are changed."""
+        reminder = self.session.query(ReminderModel).filter_by(id=reminder_id).first()
+        if not reminder:
+            return None
+        if text is not None:
+            reminder.text = text
+        if due_at is not None:
+            reminder.due_at = due_at
+        if priority is not None:
+            reminder.priority = priority.value
+        if project_context is not None:
+            reminder.project_context = project_context
+        self.session.commit()
+        self.session.refresh(reminder)
+        return reminder.to_pydantic()
+
     def delete(self, reminder_id: int) -> bool:
         """Delete a reminder permanently."""
         reminder = self.session.query(ReminderModel).filter_by(id=reminder_id).first()

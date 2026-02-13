@@ -12,10 +12,13 @@ from remind_cli.services.reminder_service import ReminderService
 
 mcp = FastMCP("Remind")
 
+# Initialize once — singleton stays alive for the MCP server's lifetime
+_db_session = DatabaseSession(DatabaseConfig())
+
 
 def _get_db_session() -> DatabaseSession:
-    """Create a database session using default config."""
-    return DatabaseSession(DatabaseConfig())
+    """Return the long-lived database session."""
+    return _db_session
 
 
 @mcp.tool
@@ -72,8 +75,6 @@ def add_reminder(
         )
     except Exception as e:
         return f"Error creating reminder: {e}"
-    finally:
-        db_session.close()
 
 
 @mcp.tool
@@ -87,33 +88,30 @@ def list_reminders(include_done: bool = False) -> str:
         Formatted list of reminders with ID, text, due date, priority, and status.
     """
     db_session = _get_db_session()
-    try:
-        with db_session.get_session() as session:
-            service = ReminderService(session)
-            reminders = service.list_all_reminders() if include_done else service.list_active_reminders()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        reminders = service.list_all_reminders() if include_done else service.list_active_reminders()
 
-        if not reminders:
-            return "No reminders found."
+    if not reminders:
+        return "No reminders found."
 
-        lines = []
-        now = datetime.now(timezone.utc)
-        for r in reminders:
-            status = ""
-            if r.done_at:
-                status = " [DONE]"
-            else:
-                due_utc = r.due_at.replace(tzinfo=timezone.utc) if r.due_at.tzinfo is None else r.due_at
-                if due_utc < now:
-                    status = " [OVERDUE]"
+    lines = []
+    now = datetime.now(timezone.utc)
+    for r in reminders:
+        status = ""
+        if r.done_at:
+            status = " [DONE]"
+        else:
+            due_utc = r.due_at.replace(tzinfo=timezone.utc) if r.due_at.tzinfo is None else r.due_at
+            if due_utc < now:
+                status = " [OVERDUE]"
 
-            project_tag = f" ({r.project_context})" if r.project_context else ""
-            lines.append(
-                f"#{r.id} [{r.priority.value.upper()}] {r.text}{project_tag} — due: {r.due_at}{status}"
-            )
+        project_tag = f" ({r.project_context})" if r.project_context else ""
+        lines.append(
+            f"#{r.id} [{r.priority.value.upper()}] {r.text}{project_tag} — due: {r.due_at}{status}"
+        )
 
-        return "\n".join(lines)
-    finally:
-        db_session.close()
+    return "\n".join(lines)
 
 
 @mcp.tool
@@ -134,8 +132,6 @@ def complete_reminder(reminder_id: int) -> str:
         return f"Completed: #{reminder.id} — {reminder.text}"
     except Exception as e:
         return f"Error: {e}"
-    finally:
-        db_session.close()
 
 
 @mcp.tool
@@ -149,22 +145,75 @@ def search_reminders(query: str) -> str:
         Matching reminders or a message if none found.
     """
     db_session = _get_db_session()
+    with db_session.get_session() as session:
+        service = ReminderService(session)
+        results = service.search_reminders(query)
+
+    if not results:
+        return f"No reminders matching '{query}'."
+
+    lines = []
+    for r in results:
+        status = " [DONE]" if r.done_at else ""
+        lines.append(f"#{r.id} [{r.priority.value.upper()}] {r.text} — due: {r.due_at}{status}")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def update_reminder(
+    reminder_id: int,
+    text: str | None = None,
+    due: str | None = None,
+    priority: str | None = None,
+    project: str | None = None,
+) -> str:
+    """Update an existing reminder. Only provided fields are changed — omit fields to keep them unchanged.
+
+    Works for both regular reminders and agent (Claude Code) reminders.
+
+    Args:
+        reminder_id: The ID number of the reminder to update.
+        text: New reminder text. For agent reminders, use the format "[AGENT:/path] task description".
+        due: New due date in natural language (e.g., "tomorrow 3pm", "in 1 hour").
+        priority: New priority — "high", "medium", or "low".
+        project: New project context.
+
+    Returns:
+        Confirmation with the updated reminder details.
+    """
+    priority_level = None
+    if priority:
+        try:
+            priority_level = PriorityLevel(priority.lower())
+        except ValueError:
+            return f"Invalid priority: {priority}. Use: high, medium, low"
+
+    due_dt = None
+    if due:
+        due_dt = dateparser_parse(due)
+        if not due_dt:
+            return f"Could not parse due date: {due}"
+
+    db_session = _get_db_session()
     try:
         with db_session.get_session() as session:
             service = ReminderService(session)
-            results = service.search_reminders(query)
-
-        if not results:
-            return f"No reminders matching '{query}'."
-
-        lines = []
-        for r in results:
-            status = " [DONE]" if r.done_at else ""
-            lines.append(f"#{r.id} [{r.priority.value.upper()}] {r.text} — due: {r.due_at}{status}")
-
-        return "\n".join(lines)
-    finally:
-        db_session.close()
+            reminder = service.update_reminder(
+                reminder_id=reminder_id,
+                text=text,
+                due_at=due_dt,
+                priority=priority_level,
+                project_context=project,
+            )
+        return (
+            f"Updated reminder #{reminder.id}.\n"
+            f"Text: {reminder.text}\n"
+            f"Due: {reminder.due_at}\n"
+            f"Priority: {reminder.priority.value}"
+        )
+    except Exception as e:
+        return f"Error: {e}"
 
 
 @mcp.tool
@@ -187,8 +236,6 @@ def delete_reminder(reminder_id: int) -> str:
         return f"Reminder #{reminder_id} not found."
     except Exception as e:
         return f"Error: {e}"
-    finally:
-        db_session.close()
 
 
 @mcp.tool
@@ -248,8 +295,6 @@ def agent_reminder(
         )
     except Exception as e:
         return f"Error creating agent reminder: {e}"
-    finally:
-        db_session.close()
 
 
 def run_mcp_server() -> None:
