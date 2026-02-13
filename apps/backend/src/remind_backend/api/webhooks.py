@@ -1,13 +1,12 @@
 """Polar webhook handler for processing payments and creating users."""
 
-import hashlib
-import hmac
 import logging
 import secrets
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Request, HTTPException
 from sqlalchemy import text
+from polar_sdk.webhooks import validate_event, WebhookVerificationError
 
 from remind_backend.config import get_settings
 from remind_backend.database import get_engine
@@ -16,7 +15,7 @@ from remind_backend.email import send_license_email
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# Map Polar product IDs to plan tiers (resolved at request time)
+
 def _get_product_tier_map() -> dict[str, str]:
     settings = get_settings()
     return {
@@ -31,67 +30,67 @@ def _generate_token(plan_tier: str) -> str:
     return f"remind_{plan_tier}_{secrets.token_hex(12)}"
 
 
-def _verify_signature(payload: bytes, signature: str, secret: str) -> bool:
-    """Verify Polar webhook signature."""
-    expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, signature)
-
-
 @router.post("/polar")
 async def polar_webhook(request: Request):
     """Handle Polar payment webhooks.
 
-    Polar sends events like 'order.created' when a customer completes checkout.
-    We create a user and email them their license token.
+    Uses polar_sdk.webhooks.validate_event for Standard Webhooks signature verification.
     """
     settings = get_settings()
     body = await request.body()
 
-    # Verify webhook signature if secret is configured
-    signature = request.headers.get("webhook-signature", "")
-    if settings.polar_webhook_secret and signature:
-        if not _verify_signature(body, signature, settings.polar_webhook_secret):
-            logger.warning("Invalid webhook signature")
-            raise HTTPException(status_code=401, detail="Invalid signature")
+    # Validate webhook signature using Polar SDK
+    try:
+        event = validate_event(
+            payload=body,
+            headers=dict(request.headers),
+            secret=settings.polar_webhook_secret,
+        )
+    except WebhookVerificationError as e:
+        logger.warning("Invalid webhook signature: %s", e)
+        raise HTTPException(status_code=403, detail="Invalid signature")
 
-    payload = await request.json()
-    event_type = payload.get("type", "")
+    event_type = event.type if hasattr(event, "type") else str(event.get("type", ""))
 
     logger.info("Polar webhook received: %s", event_type)
 
-    # Handle order completion
     if event_type in ("order.created", "subscription.created"):
-        await _handle_order(payload.get("data", {}))
+        event_data = event.data if hasattr(event, "data") else event.get("data", {})
+        await _handle_order(event_data)
     else:
         logger.info("Ignoring event type: %s", event_type)
 
     return {"status": "ok"}
 
 
-async def _handle_order(data: dict):
+async def _handle_order(data):
     """Process a completed order — create user and email token."""
-    # Extract customer info
-    customer = data.get("customer", {})
-    email = customer.get("email") or data.get("customer_email")
+    # Extract customer info — data may be a Pydantic model or dict
+    if hasattr(data, "customer"):
+        customer = data.customer
+        email = getattr(customer, "email", None)
+        product = data.product
+        product_id = getattr(product, "id", "")
+    else:
+        customer = data.get("customer", {})
+        email = customer.get("email") or data.get("customer_email")
+        product = data.get("product", {})
+        product_id = product.get("id", "")
+
     if not email:
         logger.error("No email in webhook payload: %s", data)
         return
 
-    # Determine plan tier from product ID
-    product = data.get("product", {})
-    product_id = product.get("id", "")
     tier_map = _get_product_tier_map()
-    plan_tier = tier_map.get(product_id, "free")
+    plan_tier = tier_map.get(str(product_id), "free")
 
     logger.info("Creating user: email=%s plan=%s product_id=%s", email, plan_tier, product_id)
 
-    # Generate token and insert user
     token = _generate_token(plan_tier)
     now = datetime.now(timezone.utc)
     engine = get_engine()
 
     with engine.connect() as conn:
-        # Check if user with this email already exists
         result = conn.execute(
             text("SELECT id, token, plan_tier FROM users WHERE email = :email"),
             {"email": email},
@@ -99,7 +98,6 @@ async def _handle_order(data: dict):
         existing = result.fetchone()
 
         if existing:
-            # Upgrade existing user
             conn.execute(
                 text(
                     "UPDATE users SET plan_tier = :plan_tier, active = true, updated_at = :now "
@@ -108,10 +106,9 @@ async def _handle_order(data: dict):
                 {"plan_tier": plan_tier, "now": now, "email": email},
             )
             conn.commit()
-            token = existing.token  # Keep their existing token
+            token = existing.token
             logger.info("Upgraded existing user %s to %s", email, plan_tier)
         else:
-            # Create new user
             conn.execute(
                 text(
                     "INSERT INTO users (token, email, plan_tier, created_at, updated_at, active) "
@@ -129,5 +126,4 @@ async def _handle_order(data: dict):
             conn.commit()
             logger.info("Created new user %s with plan %s", email, plan_tier)
 
-    # Send license email
     send_license_email(email, token, plan_tier)

@@ -21,6 +21,7 @@ dependencies = [
     "pydantic-settings",
     "structlog",
     "httpx",
+    "polar-sdk",
     "remind-shared",
     "remind-database",
 ]
