@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: list[str] = [
-        "https://remind.dev",
+        "https://remind.hamzaplojovic.blog",
         "https://remind-production-0871.up.railway.app",
         "http://localhost:3000",
         "http://localhost:8000",

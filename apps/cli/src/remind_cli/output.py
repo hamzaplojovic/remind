@@ -1,6 +1,6 @@
 """Output formatting layer for Remind CLI.
 
-Provides a cohesive editorial design language matching the remind.dev website:
+Provides a cohesive editorial design language matching the remind.hamzaplojovic.blog website:
 - Coral-red for accents and errors
 - Sage green for success
 - Amber for warnings and priority highlights

@@ -38,15 +38,15 @@ def create_user(
     with engine.connect() as conn:
         conn.execute(
             text(
-                "INSERT INTO users (token, email, plan_tier, created_at, expires_at, active) "
-                "VALUES (:token, :email, :plan_tier, :created_at, :expires_at, :active)"
+                "INSERT INTO users (token, email, plan_tier, created_at, updated_at, active) "
+                "VALUES (:token, :email, :plan_tier, :created_at, :updated_at, :active)"
             ),
             {
                 "token": token,
                 "email": email,
                 "plan_tier": plan_tier,
                 "created_at": now,
-                "expires_at": expires_at,
+                "updated_at": now,
                 "active": True,
             },
         )

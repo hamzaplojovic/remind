@@ -313,7 +313,7 @@ Before launching on Product Hunt, verify:
 - [ ] `.github/workflows/release-binaries.yml` is working
 - [ ] First release was successful
 - [ ] Users can: `brew tap hamzaplojovic/remind && brew install remind-cli`
-- [ ] Installation script works: `curl -sSL https://remind.dev/install.sh | bash`
+- [ ] Installation script works: `curl -sSL https://remind.hamzaplojovic.blog/install.sh | bash`
 - [ ] Website mentions Homebrew installation
 - [ ] Documentation links to `.github/AUTOMATED_SETUP_GUIDE.md`
 - [ ] GitHub secrets are configured (optional but recommended)

@@ -61,7 +61,7 @@ sudo mv remind-linux-x86_64 /usr/local/bin/remind
 
 ### 🔧 Curl Script
 ```bash
-curl -sSL https://remind.dev/install.sh | bash
+curl -sSL https://remind.hamzaplojovic.blog/install.sh | bash
 ```
 
 ---

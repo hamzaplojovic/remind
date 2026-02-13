@@ -34,7 +34,7 @@ cat > "${BUILD_DIR}/DEBIAN/control" << EOF
 Package: ${REPO_NAME}
 Version: ${VERSION}
 Architecture: ${ARCH}
-Maintainer: Remind Contributors <support@remind.dev>
+Maintainer: Remind Contributors <support@remind.hamzaplojovic.blog>
 Description: AI-powered CLI reminder and notification engine
  Remind is a cross-platform CLI tool for managing reminders with desktop
  notifications and AI-powered suggestions (premium feature).

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Remind Installation Script
-# Install via: curl -sSL https://remind.dev/install.sh | bash
+# Install via: curl -sSL https://remind.hamzaplojovic.blog/install.sh | bash
 
 set -e
 

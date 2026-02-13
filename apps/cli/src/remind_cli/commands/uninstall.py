@@ -39,7 +39,7 @@ def uninstall(
         output.text("  1. Remove 'remind' from your PATH")
         output.text("  2. Reminders preserved in ~/.remind/")
         output.blank()
-        output.hint("To reinstall: https://remind.dev/install")
+        output.hint("To reinstall: https://remind.hamzaplojovic.blog/install")
         output.blank()
 
     except typer.Abort:

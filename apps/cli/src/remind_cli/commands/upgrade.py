@@ -49,7 +49,7 @@ def upgrade() -> None:
 
         output.blank()
         output.rule()
-        output.hint("Visit https://remind.dev/upgrade to manage your plan")
+        output.hint("Visit https://remind.hamzaplojovic.blog/upgrade to manage your plan")
         output.blank()
 
     except Exception as e:

@@ -149,7 +149,7 @@ docker run -e REMIND_OPENAI_API_KEY=sk-... remind-backend
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name api.remind.dev;
+    server_name api.remind.hamzaplojovic.blog;
 
     ssl_certificate /path/to/cert;
     ssl_certificate_key /path/to/key;
