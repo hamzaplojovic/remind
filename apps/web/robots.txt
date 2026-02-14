@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://remind.hamzaplojovic.blog/sitemap.xml
