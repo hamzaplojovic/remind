@@ -1,0 +1,45 @@
+# Remind CLI
+
+> AI-powered reminders for the terminal with native Claude Code integration via MCP.
+
+## Overview
+
+Remind is a CLI reminder and notification tool built for developers. It features AI-powered natural language processing, desktop notifications, and is the first CLI tool with native Claude Code support through the Model Context Protocol (MCP).
+
+## Installation
+
+```
+pip install remind-cli
+```
+
+Or via Homebrew:
+
+```
+brew install remind-cli
+```
+
+## Key Features
+
+- Natural language reminder creation: `remind add "Ship the feature tomorrow at 3pm"`
+- AI-powered rephrasing and priority suggestions
+- Desktop notifications (macOS and Linux)
+- 15 MCP tools for Claude Code integration
+- Agent reminders and autonomous task scheduling
+- Local SQLite storage with optional cloud sync
+- Priority levels, snoozing, and recurring reminders
+
+## Documentation
+
+- Getting Started: https://remind.hamzaplojovic.blog/docs/getting-started
+- Commands: https://remind.hamzaplojovic.blog/docs/commands
+- Configuration: https://remind.hamzaplojovic.blog/docs/configuration
+- AI Features: https://remind.hamzaplojovic.blog/docs/ai-features
+- Claude Code Integration: https://remind.hamzaplojovic.blog/integrations
+- Troubleshooting: https://remind.hamzaplojovic.blog/docs/troubleshooting
+
+## Links
+
+- Website: https://remind.hamzaplojovic.blog
+- GitHub: https://github.com/hamzaplojovic/remind
+- PyPI: https://pypi.org/project/remind-cli/
+- Changelog: https://remind.hamzaplojovic.blog/changelog
