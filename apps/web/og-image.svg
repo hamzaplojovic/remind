@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <!-- Paper texture grain filter -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grayNoise"/>
+      <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blended"/>
+      <feComponentTransfer in="blended">
+        <feFuncA type="linear" slope="1"/>
+      </feComponentTransfer>
+    </filter>
+    <!-- Subtle vignette -->
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#faf7f2" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#1a1715" stop-opacity="0.06"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background: warm paper -->
+  <rect width="1200" height="630" fill="#faf7f2"/>
+
+  <!-- Subtle grain overlay -->
+  <rect width="1200" height="630" fill="#faf7f2" filter="url(#grain)" opacity="0.08"/>
+
+  <!-- Vignette overlay -->
+  <rect width="1200" height="630" fill="url(#vignette)"/>
+
+  <!-- Top decorative line -->
+  <rect x="80" y="60" width="1040" height="1.5" fill="#d4cfc7" rx="1"/>
+
+  <!-- Coral dot brand element (top-left) -->
+  <circle cx="110" cy="100" r="10" fill="#e8503a"/>
+
+  <!-- Title: "Remind" -->
+  <text x="600" y="230" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="96" font-weight="400" fill="#1a1715"
+        letter-spacing="-1">Remind</text>
+
+  <!-- Coral dot after title -->
+  <circle cx="755" cy="210" r="8" fill="#e8503a"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="285" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="28" font-weight="400" fill="#6b645c"
+        letter-spacing="0.5">AI-Powered Reminders for the Terminal</text>
+
+  <!-- Terminal snippet background -->
+  <rect x="240" y="330" width="720" height="72" rx="10" fill="#1a1715"/>
+
+  <!-- Terminal dots -->
+  <circle cx="268" cy="366" r="5" fill="#e8503a" opacity="0.9"/>
+  <circle cx="286" cy="366" r="5" fill="#b0a99e" opacity="0.4"/>
+  <circle cx="304" cy="366" r="5" fill="#b0a99e" opacity="0.4"/>
+
+  <!-- Terminal prompt -->
+  <text x="330" y="372" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, monospace"
+        font-size="18" fill="#52b788">$</text>
+  <text x="352" y="372" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, monospace"
+        font-size="18" fill="#f0ebe4">remind add</text>
+  <text x="480" y="372" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, monospace"
+        font-size="18" fill="#ff6b55">"Ship the feature"</text>
+  <text x="707" y="372" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, monospace"
+        font-size="18" fill="#b0a99e">--priority</text>
+  <text x="842" y="372" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, monospace"
+        font-size="18" fill="#e8503a">high</text>
+
+  <!-- Bottom URL -->
+  <text x="600" y="530" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="18" font-weight="500" fill="#b0a99e"
+        letter-spacing="1.5">remind.hamzaplojovic.blog</text>
+
+  <!-- Bottom decorative line -->
+  <rect x="80" y="568" width="1040" height="1.5" fill="#d4cfc7" rx="1"/>
+
+  <!-- Small coral dot (bottom-right, echoing top-left) -->
+  <circle cx="1090" cy="530" r="6" fill="#e8503a" opacity="0.6"/>
+</svg>
