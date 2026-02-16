@@ -140,3 +140,5 @@ remind register
 ## License
 
 MIT
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=d183fc32-8844-4bb4-b7af-1b2fa945b8a2" />
