@@ -92,6 +92,13 @@ class SchedulerRunner:
         match = AGENT_PATTERN.match(reminder.text)
         if match:
             self._execute_agent_task(reminder, match.group(1), match.group(2))
+            # Mark as done after execution (regardless of success/failure)
+            with self.db_session.get_session() as session:
+                service = ReminderService(session)
+                try:
+                    service.mark_reminder_done(reminder.id)
+                except Exception:
+                    pass  # Best effort
             return
 
         try:
@@ -115,7 +122,7 @@ class SchedulerRunner:
                 cwd=cwd,
                 capture_output=True,
                 text=True,
-                timeout=600,  # 10 minute timeout
+                timeout=3600,  # 1 hour timeout
             )
             if result.returncode == 0:
                 output.info(f"Agent task #{reminder.id} completed successfully")
